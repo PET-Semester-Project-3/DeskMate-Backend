@@ -17,11 +17,11 @@ The development script runs nodemon on `src/server.js` and reloads on file chang
 
 ```
 src/
-	app.js
-	server.js
-	routes/
-		index.js
-		item.routes.js
+  app.js
+  server.js
+  routes/
+    index.js
+    item.routes.js
 ```
 
 - `app.js` wires middleware and mounts API routers.
@@ -37,4 +37,3 @@ src/
 - `POST /` — Create an item
 - `PUT /:id` — Update an item by id
 - `DELETE /:id` — Delete an item by id
-
