@@ -38,4 +38,3 @@ src/
 - `PUT /:id` — Update an item by id
 - `DELETE /:id` — Delete an item by id
 
-Handlers are intentionally empty so you can wire them to PostgreSQL logic later.
