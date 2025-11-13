@@ -1,23 +1,25 @@
-import express, { Request, Response } from 'express';
-import dotenv from 'dotenv';
-import userRoutes from './routes/userRoutes';
+import express, { Request, Response } from "express"
+import dotenv from "dotenv"
+import userRoutes from "./routes/userRoutes"
+import deskRoutes from "./routes/deskRoutes"
 
-dotenv.config();
+dotenv.config()
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const app = express()
+const PORT = process.env.PORT || 3000
 
 // Middleware
-app.use(express.json());
+app.use(express.json())
 
 // Routes
-app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'DeskMate API - Ready' });
-});
+app.get("/", (req: Request, res: Response) => {
+  res.json({ message: "DeskMate API - Ready" })
+})
 
 // API Routes
-app.use('/api/users', userRoutes);
+app.use("/api/users", userRoutes)
+app.use("/api/desks", deskRoutes)
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+  console.log(`Server is running on http://localhost:${PORT}`)
+})
