@@ -2,6 +2,7 @@ import express, { Request, Response } from "express"
 import dotenv from "dotenv"
 import userRoutes from "./routes/userRoutes"
 import deskRoutes from "./routes/deskRoutes"
+import scheduledTaskRoutes from "./routes/scheduledTaskRoutes"
 
 dotenv.config()
 
@@ -19,6 +20,7 @@ app.get("/", (req: Request, res: Response) => {
 // API Routes
 app.use("/api/users", userRoutes)
 app.use("/api/desks", deskRoutes)
+app.use("/api/scheduledTasks", scheduledTaskRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)
