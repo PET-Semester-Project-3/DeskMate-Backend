@@ -77,7 +77,7 @@ model Controller{
 model ScheduledTask{
   id String @id @default(uuid())
   desk_id String
-  controller_id String
+  user_id String
   description String @db.VarChar(255)
   new_height Int
   created_at DateTime @default(now())
@@ -86,7 +86,7 @@ model ScheduledTask{
   completed_at DateTime
   status ScheduledTaskStatus @default(PENDING)
   error_message String @db.VarChar(255)
-  user User @relation(fields: [controller_id], references: [id], onDelete: Cascade)
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
   desk Desk @relation(fields: [desk_id], references: [id], onDelete: Cascade)
 }
 
