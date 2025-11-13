@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../db/prisma';
+import bcrypt from 'bcryptjs';
 
 /**
  * Get all users
@@ -104,11 +105,11 @@ export const createUser = async (req: Request, res: Response) => {
       });
     }
 
-    // TODO: We need to actually has the password someone pls do
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
       data: {
         email,
-        password_hash: password,
+        password_hash: hashedPassword,
       },
       select: {
         id: true,
@@ -154,7 +155,7 @@ export const updateUser = async (req: Request, res: Response) => {
 
     const updateData: any = {};
     if (email) updateData.email = email;
-    if (password) updateData.password_hash = password;
+    if (password) updateData.password_hash = await bcrypt.hash(password, 10);
     if (email && email !== existingUser.email) {
       const emailExists = await prisma.user.findUnique({
         where: { email },
