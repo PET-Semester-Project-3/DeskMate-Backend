@@ -1,18 +1,33 @@
 import express, { Request, Response } from "express"
 import dotenv from "dotenv"
+import cors from 'cors'
 import userRoutes from "./routes/userRoutes"
 import deskRoutes from "./routes/deskRoutes"
 import scheduledTaskRoutes from "./routes/scheduledTaskRoutes"
 import permissionRoutes from "./routes/permissionRoutes"
 import controllerRoutes from "./routes/controllerRoutes"
 
+
 dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 3000
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:5173'];
 
 // Middleware
 app.use(express.json())
+
+// Cors
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
 
 // Routes
 app.get("/", (req: Request, res: Response) => {

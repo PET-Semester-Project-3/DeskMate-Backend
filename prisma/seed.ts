@@ -73,25 +73,25 @@ async function main() {
   // Create demo UserToDesk relations
   if (isCreateUserToDeskRelations) {
     console.log('Creating demo UserToDesk relations...');
-    const userToDeskRelation1 = await createUserToDesk('1', '1', '1', new Date('2025-11-14T18:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation2 = await createUserToDesk('2', '1', '2', new Date('2025-11-14T13:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation3 = await createUserToDesk('3', '2', '1', new Date('2025-11-14T18:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation4 = await createUserToDesk('4', '2', '2', new Date('2025-11-14T13:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation5 = await createUserToDesk('5', '2', '3', new Date('2025-11-04T13:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation6 = await createUserToDesk('6', '2', '4', new Date('2025-10-04T13:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation7 = await createUserToDesk('7', '2', '5', new Date('2025-10-07T13:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation1 = await createUserToDesk('1', '2', '1', new Date('2025-11-14T18:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation2 = await createUserToDesk('2', '2', '2', new Date('2025-11-14T13:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation3 = await createUserToDesk('3', '1', '1', new Date('2025-11-14T18:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation4 = await createUserToDesk('4', '1', '2', new Date('2025-11-14T13:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation5 = await createUserToDesk('5', '1', '3', new Date('2025-11-04T13:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation6 = await createUserToDesk('6', '1', '4', new Date('2025-10-04T13:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation7 = await createUserToDesk('7', '1', '5', new Date('2025-10-07T13:00'), new Date('2025-01-01T09:00'));
     console.log('Created UserToDesk relations:', { userToDeskRelation1, userToDeskRelation2, userToDeskRelation3, userToDeskRelation4, userToDeskRelation5, userToDeskRelation6, userToDeskRelation7 });
   }
 
   // Create demo UserToPermission relations
   if (isCreateUserToPermissionsRelations) {
     console.log('Creating demo UserToPermission relations...');
-    const userToPermissionRelation1 = await createUserToPermission('1', '1', '1', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const userToPermissionRelation2 = await createUserToPermission('2', '1', '2', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const userToPermissionRelation3 = await createUserToPermission('3', '2', '1', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const userToPermissionRelation4 = await createUserToPermission('4', '2', '2', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const userToPermissionRelation5 = await createUserToPermission('5', '2', '3', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const userToPermissionRelation6 = await createUserToPermission('6', '2', '4', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation1 = await createUserToPermission('1', '2', '1', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation2 = await createUserToPermission('2', '2', '2', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation3 = await createUserToPermission('3', '1', '1', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation4 = await createUserToPermission('4', '1', '2', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation5 = await createUserToPermission('5', '1', '3', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation6 = await createUserToPermission('6', '1', '4', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     console.log('Created UserToPermission relations:', { userToPermissionRelation1, userToPermissionRelation2, userToPermissionRelation3, userToPermissionRelation4, userToPermissionRelation5, userToPermissionRelation6 });
   }
 

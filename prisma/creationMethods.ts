@@ -107,7 +107,13 @@ export async function createUserToDesk(
 ) {
   const userToDesk = await prisma.userDesk.upsert({
     where: { id: id },
-    update: { },
+    update: {
+      id,
+      user_id,
+      desk_id,
+      created_at,
+      updated_at
+    },
     create: {
       id,
       user_id,
@@ -125,7 +131,13 @@ export async function createUserToPermission(
 ) {
   const userToPermission = await prisma.userPermission.upsert({
     where: { id: id },
-    update: {},
+    update: {
+      id,
+      user_id,
+      permission_id,
+      created_at,
+      updated_at,
+    },
     create: {
       id,
       user_id,

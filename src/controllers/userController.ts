@@ -246,6 +246,7 @@ export const getUserPermissions = async (req: Request, res: Response) => {
       include: { permission: true },
     })
     res.json({ success: true, data: perms })
+    
   } catch (error) {
     console.error("Error fetching user permissions:", error)
     res.status(500).json({ success: false, message: "Failed to fetch user permissions" })
