@@ -26,9 +26,10 @@ export const getPermissionById = async (req: Request, res: Response) => {
 
 export const createPermission = async (req: Request, res: Response) => {
   try {
-    const { name } = req.body
-    if (!name) return res.status(400).json({ success: false, message: "name required" })
-    const perm = await prisma.permission.create({ data: { name } })
+    const { label, route } = req.body
+    if (!label) return res.status(400).json({ success: false, message: "label required" })
+    if (!route) return res.status(400).json({ success: false, message: "route required" })
+    const perm = await prisma.permission.create({ data: { label, route } })
     res.status(201).json({ success: true, data: perm })
   } catch (error) {
     console.error("Error creating permission:", error)
@@ -39,11 +40,11 @@ export const createPermission = async (req: Request, res: Response) => {
 export const updatePermission = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
-    const { name } = req.body
+    const { label, route } = req.body
     const existing = await prisma.permission.findUnique({ where: { id } })
     if (!existing)
       return res.status(404).json({ success: false, message: "Permission not found" })
-    const perm = await prisma.permission.update({ where: { id }, data: { name } })
+    const perm = await prisma.permission.update({ where: { id }, data: { label, route } })
     res.json({ success: true, data: perm })
   } catch (error) {
     console.error("Error updating permission:", error)
