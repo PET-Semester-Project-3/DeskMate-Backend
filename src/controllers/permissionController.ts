@@ -27,8 +27,7 @@ export const getPermissionById = async (req: Request, res: Response) => {
 export const createPermission = async (req: Request, res: Response) => {
   try {
     const { label, route } = req.body
-    if (!label) return res.status(400).json({ success: false, message: "label required" })
-    if (!route) return res.status(400).json({ success: false, message: "route required" })
+    if (!label || !route) return res.status(400).json({ success: false, message: "label and route required" })
     const perm = await prisma.permission.create({ data: { label, route } })
     res.status(201).json({ success: true, data: perm })
   } catch (error) {
