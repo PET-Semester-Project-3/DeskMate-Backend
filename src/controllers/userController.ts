@@ -364,4 +364,38 @@ export const changePassword = async (req: Request, res: Response) => {
   }
 }
 
+/**
+ * Login user
+ * POST /api/users/login
+ * Body: { email: string, password: string }
+ */
+export const loginUser = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body
+    if (!email || !password)
+      return res
+        .status(400)
+        .json({ success: false, message: "Email and password required" })
 
+    const user = await prisma.user.findUnique({ where: { email } })
+    if (!user)
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" })
+
+    const match = await bcrypt.compare(password, user.password_hash)
+    if (!match)
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" })
+
+    // strip sensitive field
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password_hash, ...safeUser } = user as any
+
+    res.json({ success: true, data: safeUser })
+  } catch (error) {
+    console.error("Error during login:", error)
+    res.status(500).json({ success: false, message: "Failed to login" })
+  }
+}
