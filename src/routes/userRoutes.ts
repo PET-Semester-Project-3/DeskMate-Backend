@@ -13,6 +13,7 @@ import {
   removePermissionFromUser,
   getUserScheduledTasks,
   changePassword,
+  loginUser,
 } from "../controllers/userController"
 
 const router = Router()
@@ -24,6 +25,9 @@ router.get("/", getAllUsers)
 
 // POST /api/users - Create new user
 router.post("/", createUser)
+
+// POST /api/users/login - Login
+router.post("/login", loginUser)
 
 // PUT /api/users/:id - Update user
 router.put("/:id", updateUser)
