@@ -1,7 +1,8 @@
 import dotenv from 'dotenv';
 import { prisma } from '../src/db/prisma';
-import { createUser, createDesk, createPermission, createUserToDesk, createUserToPermission } from './creationMethods'
+import { createUser, createDesk, createPermission, createUserToDesk, createUserToPermission, createController, createScheduledTask } from './creationMethods'
 import { JsonNullValueInput } from '../src/generated/prisma/internal/prismaNamespace';
+import { ScheduledTaskStatus } from '../src/generated/prisma/enums';
 
 // Load environment variables
 dotenv.config();
@@ -12,10 +13,10 @@ async function main() {
   const isClear = false;
 
   const isCreateUsers = true;
+  const isCreateControllers = true;
   const isCreateDesks = true;
   const isCreatePermissions = true;
-  //const isCreateControllers = true;
-  // const isCreateScheduledTask = true;
+  const isCreateScheduledTask = true;
   const isCreateUserToDeskRelations = true;
   const isCreateUserToPermissionsRelations = true;
 
@@ -30,6 +31,14 @@ async function main() {
     await prisma.desk.deleteMany();
     await prisma.user.deleteMany();
     console.log('Existing data cleared.');
+  }
+
+  // Create demo controllers
+  if (isCreateControllers) {
+    console.log('Creating demo controllers...');
+    const controller1 = await createController('8bdd51ed-2e55-4b96-9982-2d5265403d3c', 'Controller 1');
+    const controller2 = await createController('1639f8fa-44c0-434f-be0b-b4f752be634d', 'Controller 2');
+    console.log('Created controllers:', { controller1, controller2 });
   }
 
   // Create demo users
@@ -51,11 +60,11 @@ async function main() {
   // Create demo desks
   if (isCreateDesks) {
     console.log('Creating demo desks...');
-    const desk1 = await createDesk('1', null, 'DCD1', 'Linak', false, 
+    const desk1 = await createDesk('1', '8bdd51ed-2e55-4b96-9982-2d5265403d3c', 'DCD1', 'Linak', false, 
       JsonNullValueInput.JsonNull,
       new Date('2025-11-14T18:11'), 75, new Date('2025-11-14T18:00'), new Date('2025-11-14T18:11')
     )
-    const desk2 = await createDesk('2', null, 'DCD2', 'Linak', false, 
+    const desk2 = await createDesk('2', '1639f8fa-44c0-434f-be0b-b4f752be634d', 'DCD2', 'Linak', false, 
       JsonNullValueInput.JsonNull,
       new Date('2025-11-11T13:10'), 75, new Date('2025-11-14T13:00'), new Date('2025-11-14T13:10')
     )
@@ -84,12 +93,37 @@ async function main() {
     console.log('Created permissions:', { permission1, permission2, permission3, permission4 });
   }
 
-  // Create demo permissions
-  /* if (isCreateControllers) {
-    console.log('Creating demo controllers...');
-    const permission1 = createPermission('1', 'Dashboard', '/', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    console.log('Created permissions:', { controller1 });
-  } */
+  // Create demo scheduled tasks
+  if (isCreateScheduledTask) {
+    console.log('Creating demo scheduled tasks...');
+    const scheduledTask1 = await createScheduledTask(
+      'd8c476ad-f436-4f15-81fc-6297879ac17b', 
+      '1',
+      'd812baf1-1d50-4c83-ad2e-d65dd1d0dce2',
+      'Morning Routine',
+      110,
+      new Date('2025-11-13T08:00'),
+      new Date('2025-11-14T09:00'),
+      new Date('2025-11-14T09:00'),
+      new Date('2025-11-14T12:00'),
+      ScheduledTaskStatus.IN_PROGRESS,
+      ''
+    );
+    const scheduledTask2 = await createScheduledTask(
+      'f5209a0c-9cbe-44e6-a745-d651f8cef7d7',
+      '2',
+      'd93419b8-7f82-4a1f-943d-6ad9bde6d993',
+      'Evening Routine',
+      140,
+      new Date('2025-11-13T08:00'),
+      new Date('2025-11-14T09:00'),
+      new Date('2025-11-14T15:00'),
+      new Date('2025-11-14T18:00'),
+      ScheduledTaskStatus.IN_PROGRESS,
+      ''
+    );
+    console.log('Created scheduled tasks:', { scheduledTask1, scheduledTask2 });
+  }
 
   // Create demo UserToDesk relations
   if (isCreateUserToDeskRelations) {
