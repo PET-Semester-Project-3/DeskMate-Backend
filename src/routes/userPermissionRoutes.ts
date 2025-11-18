@@ -3,7 +3,7 @@ import { getAllUserPermissions } from "../controllers/userPermissionController"
 
 const router = Router()
 
-// GET /api/userPermissions
+// GET /api/user-permissions
 router.get("/", getAllUserPermissions)
 
 export default router

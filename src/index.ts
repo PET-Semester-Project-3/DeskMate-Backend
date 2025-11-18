@@ -40,11 +40,11 @@ app.get("/", (req: Request, res: Response) => {
 // API Routes
 app.use("/api/users", userRoutes)
 app.use("/api/desks", deskRoutes)
-app.use("/api/scheduledTasks", scheduledTaskRoutes)
+app.use("/api/scheduled-tasks", scheduledTaskRoutes)
 app.use("/api/permissions", permissionRoutes)
 app.use("/api/controllers", controllerRoutes)
-app.use("/api/userDesks", userDeskRoutes)
-app.use("/api/userPermissions", userPermissionRoutes)
+app.use("/api/user-desks", userDeskRoutes)
+app.use("/api/user-permissions", userPermissionRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)
