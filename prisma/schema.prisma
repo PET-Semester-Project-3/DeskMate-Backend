@@ -31,6 +31,7 @@ model Desk {
   name         String     @db.VarChar(50)
   manufacturer String     @db.VarChar(50)
   is_locked    Boolean    @default(false)
+  height       Int        @default(75)
   last_data    Json       @default("{}") @db.JsonB
   last_data_at DateTime   @default(now())
   created_at   DateTime   @default(now())

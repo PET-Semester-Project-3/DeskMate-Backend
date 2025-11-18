@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Desk" ADD COLUMN     "height" INTEGER NOT NULL DEFAULT 75;
