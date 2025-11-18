@@ -4,14 +4,25 @@ import { JsonNullValueInput } from '../src/generated/prisma/internal/prismaNames
 
 //#region Create Objects
 
-export async function createUser(id:string, email: string, password_hash: string) {
+export async function createUser(
+  id:string, email: string, password_hash: string,
+  created_at?:Date, updated_at?:Date
+) {
   const user = await prisma.user.upsert({
     where: { email: email },
-    update: {},
+    update: {
+      id,
+      email,
+      password_hash,
+      created_at,
+      updated_at
+    },
     create: {
       id,
       email,
       password_hash,
+      created_at,
+      updated_at
     },
   });
   return user;
@@ -24,7 +35,17 @@ export async function createDesk(
 ) {
   const desk = await prisma.desk.upsert({
     where: { id: id },
-    update: {},
+    update: {
+      id,
+      controller_id,
+      name,
+      manufacturer,
+      is_locked,
+      last_data,
+      last_data_at,
+      created_at,
+      updated_at
+    },
     create: {
       id,
       controller_id,
@@ -46,7 +67,13 @@ export async function createPermission(
 ) {
   const permission = await prisma.permission.upsert({
     where: { route: route },
-    update: {},
+    update: {
+      id,
+      label,
+      route,
+      created_at,
+      updated_at,
+    },
     create: {
       id,
       label,
@@ -61,7 +88,10 @@ export async function createPermission(
 export async function createController(id: string, name: string) {
   const controller = await prisma.controller.upsert({
     where: { id: id },
-    update: {},
+    update: {
+      id,
+      name,
+    },
     create: {
       id,
       name,
@@ -79,7 +109,19 @@ export async function createScheduledTask(
 ) {
   const scheduledTask = await prisma.scheduledTask.upsert({
     where: { id: id },
-    update: {},
+    update: {
+      id,
+      desk_id,
+      user_id,
+      description,
+      new_height,
+      created_at,
+      updated_at,
+      scheduled_at,
+      completed_at,
+      status,
+      error_message
+    },
     create: {
       id,
       desk_id,

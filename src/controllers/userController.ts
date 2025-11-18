@@ -91,7 +91,12 @@ export const createUser = async (req: Request, res: Response) => {
     if (existingUser)
       return res.status(409).json({ success: false, message: "User exists" })
 
-    const hashedPassword = await bcrypt.hash(password, 10) // 10 should be +1 for each user
+    const userCount = await prisma.user.findMany({
+      select: {
+        id: true,
+      },
+    })
+    const hashedPassword = await bcrypt.hash(password, Number(userCount))
     const user = await prisma.user.create({
       data: { email, password_hash: hashedPassword },
       select: { id: true, email: true, created_at: true, updated_at: true },
