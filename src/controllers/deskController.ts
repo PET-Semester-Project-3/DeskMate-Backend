@@ -49,17 +49,19 @@ export const getDeskById = async (req: Request, res: Response) => {
 export const createDesk = async (req: Request, res: Response) => {
   try {
     const { id, controllerId, name, manufacturer, is_locked, last_data } = req.body
-    if (!id || !controllerId || !name || !manufacturer)
+    if (!id || !name || !manufacturer)
       return res
         .status(400)
         .json({
           success: false,
-          message: "id, controllerId, name and manufacturer required",
+          message: "id, name and manufacturer required",
         })
-
-    const controller = await prisma.controller.findUnique({ where: { id: controllerId } })
-    if (!controller)
-      return res.status(404).json({ success: false, message: "Controller not found" })
+    
+    if (controllerId){
+      const controller = await prisma.controller.findUnique({ where: { id: controllerId } })
+      if (!controller)
+        return res.status(404).json({ success: false, message: "Controller not found" })
+    }
 
     const desk = await prisma.desk.create({
       data: {
