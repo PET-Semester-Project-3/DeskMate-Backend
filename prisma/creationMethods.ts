@@ -29,10 +29,7 @@ export async function createUser(
 }
 
 export async function createDesk(
-    id: string, controller_id:string | null , name:string,
-    manufacturer:string, is_locked:boolean, last_data: JsonNullValueInput,
-    last_data_at:Date, created_at:Date, updated_at:Date
-) {
+id: string, controller_id: string | null, name: string, manufacturer: string, is_locked: boolean, last_data: JsonNullValueInput, last_data_at: Date, height: number, created_at: Date, updated_at: Date) {
   const desk = await prisma.desk.upsert({
     where: { id: id },
     update: {
@@ -43,6 +40,7 @@ export async function createDesk(
       is_locked,
       last_data,
       last_data_at,
+      height,
       created_at,
       updated_at
     },
@@ -54,6 +52,7 @@ export async function createDesk(
       is_locked,
       last_data,
       last_data_at,
+      height,
       created_at,
       updated_at
     },
