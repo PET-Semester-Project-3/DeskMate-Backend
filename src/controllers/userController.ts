@@ -114,8 +114,6 @@ export const updateUser = async (req: Request, res: Response) => {
     const { id } = req.params
     const { email, password } = req.body
 
-    console.log(id, email)
-
     const existingUser = await prisma.user.findUnique({ where: { id } })
     if (!existingUser)
       return res.status(404).json({ success: false, message: "User not found" })
