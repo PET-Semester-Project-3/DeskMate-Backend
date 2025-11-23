@@ -110,6 +110,63 @@ export const createUser = async (req: Request, res: Response) => {
 }
 
 /**
+ * Create a new user and optionally assign permissions in a single transaction
+ * POST /api/users/with-permissions
+ * Body: { email: string, permissionIds?: string[] }
+ */
+export const createUserWithPermissions = async (req: Request, res: Response) => {
+  try {
+    const { email, permissionIds } = req.body
+    if (!email) return res.status(400).json({ success: false, message: "Email required" })
+
+    const existingUser = await prisma.user.findUnique({ where: { email } })
+    if (existingUser)
+      return res.status(409).json({ success: false, message: "User exists" })
+
+    // If permissionIds provided, validate they all exist first (so we can return 404 when some are missing)
+    if (permissionIds && Array.isArray(permissionIds) && permissionIds.length > 0) {
+      const perms = await prisma.permission.findMany({
+        where: { id: { in: permissionIds } },
+        select: { id: true },
+      })
+      const foundIds = perms.map((p) => p.id)
+      if (foundIds.length !== permissionIds.length)
+        return res
+          .status(404)
+          .json({ success: false, message: "One or more permissions not found" })
+    }
+
+    // create user with empty password (users can set/change it later)
+    // password_hash is non-nullable in schema, so store empty string
+    const created = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: { email, password_hash: "" },
+        select: { id: true, email: true, created_at: true, updated_at: true },
+      })
+
+      if (permissionIds && Array.isArray(permissionIds) && permissionIds.length > 0) {
+        const toCreate = permissionIds.map((pid) => ({
+          user_id: user.id,
+          permission_id: pid,
+        }))
+        if (toCreate.length > 0) {
+          await tx.userPermission.createMany({ data: toCreate })
+        }
+      }
+
+      return user
+    })
+
+    res.status(201).json({ success: true, data: created })
+  } catch (error) {
+    console.error("Error creating user with permissions:", error)
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to create user with permissions" })
+  }
+}
+
+/**
  * Update user
  * PUT /api/users/:id
  * Body: { email?: string, password?: string }
@@ -251,7 +308,6 @@ export const getUserPermissions = async (req: Request, res: Response) => {
       include: { permission: true },
     })
     res.json({ success: true, data: perms })
-    
   } catch (error) {
     console.error("Error fetching user permissions:", error)
     res.status(500).json({ success: false, message: "Failed to fetch user permissions" })
