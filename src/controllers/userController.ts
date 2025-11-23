@@ -91,12 +91,7 @@ export const createUser = async (req: Request, res: Response) => {
     if (existingUser)
       return res.status(409).json({ success: false, message: "User exists" })
 
-    const userCount = await prisma.user.findMany({
-      select: {
-        id: true,
-      },
-    })
-    const hashedPassword = await bcrypt.hash(password, Number(userCount))
+    const hashedPassword = await bcrypt.hash(password, 10)
     const user = await prisma.user.create({
       data: { email, password_hash: hashedPassword },
       select: { id: true, email: true, created_at: true, updated_at: true },
@@ -118,6 +113,8 @@ export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
     const { email, password } = req.body
+
+    console.log(id, email)
 
     const existingUser = await prisma.user.findUnique({ where: { id } })
     if (!existingUser)
