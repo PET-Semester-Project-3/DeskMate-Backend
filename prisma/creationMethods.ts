@@ -5,7 +5,7 @@ import { JsonNullValueInput } from '../src/generated/prisma/internal/prismaNames
 //#region Create Objects
 
 export async function createUser(
-  id:string, email: string, password_hash: string,
+  id:string, email: string, password_hash: string, main_desk_id: string,
   created_at?:Date, updated_at?:Date
 ) {
   const user = await prisma.user.upsert({
@@ -15,32 +15,32 @@ export async function createUser(
       email,
       password_hash,
       created_at,
-      updated_at
+      updated_at,
+      main_desk_id
     },
     create: {
       id,
       email,
       password_hash,
       created_at,
-      updated_at
+      updated_at,
+      main_desk_id
     },
   });
   return user;
 }
 
 export async function createDesk(
-id: string, controller_id: string | null, name: string, manufacturer: string, is_locked: boolean, last_data: JsonNullValueInput, last_data_at: Date, height: number, created_at: Date, updated_at: Date) {
+id: string, controller_id: string | null, name: string, is_locked: boolean, last_data: string, last_data_at: Date, created_at: Date, updated_at: Date) {
   const desk = await prisma.desk.upsert({
     where: { id: id },
     update: {
       id,
       controller_id,
       name,
-      manufacturer,
       is_locked,
       last_data,
       last_data_at,
-      height,
       created_at,
       updated_at
     },
@@ -48,11 +48,9 @@ id: string, controller_id: string | null, name: string, manufacturer: string, is
       id,
       controller_id,
       name,
-      manufacturer,
       is_locked,
       last_data,
       last_data_at,
-      height,
       created_at,
       updated_at
     },
