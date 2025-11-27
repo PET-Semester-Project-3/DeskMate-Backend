@@ -62,24 +62,24 @@ async function main() {
   // Create demo desks
   if (isCreateDesks) {
     console.log('Creating demo desks...');
-    const desk1 = await createDesk('1', '8bdd51ed-2e55-4b96-9982-2d5265403d3c', 'DCD1', false, 
-      "{manufacturer:\"Linak\", height:\"75\",errors:[\"Pressure Sensor\",\"Connection Issue\"]}",
+    const desk1 = await createDesk('1', '8bdd51ed-2e55-4b96-9982-2d5265403d3c', 'DCD1', false,
+      JSON.parse("{\"manufacturer\":\"Linak\", \"height\":\"75\",\"errors\":[\"Pressure Sensor\",\"Connection Issue\"]}"),
       new Date('2025-11-14T18:11'), new Date('2025-11-14T18:00'), new Date('2025-11-14T18:11')
     )
     const desk2 = await createDesk('2', '1639f8fa-44c0-434f-be0b-b4f752be634d', 'DCD2', false, 
-      "{manufacturer:\"Linak\", height:\"75\"}",
+      JSON.parse("{\"manufacturer\":\"Linak\", \"height\":\"75\"}"),
       new Date('2025-11-11T13:10'), new Date('2025-11-14T13:00'), new Date('2025-11-14T13:10')
     )
     const desk3 = await createDesk('3', null, 'DCD3', true, 
-      "{manufacturer:\"Linak\", height:\"75\"}",
+      JSON.parse("{\"manufacturer\":\"Linak\", \"height\":\"75\"}"),
       new Date('2025-11-04T13:10'), new Date('2025-11-04T13:00'), new Date('2025-11-04T04:10')
     )
     const desk4 = await createDesk('4', null, 'DCD4', false, 
-      "{manufacturer:\"Linak\", height:\"75\",errors:[\"Pressure Sensor\"]}",
+      JSON.parse("{\"manufacturer\":\"Linak\", \"height\":\"75\",\"errors\":[\"Pressure Sensor\"]}"),
       new Date('2025-10-04T13:10'), new Date('2025-10-04T13:00'), new Date('2025-10-04T04:10')
     )
     const desk5 = await createDesk('5', null, 'DCD5', false, 
-      "{manufacturer:\"Linak\", height:\"75\"}",
+      JSON.parse("{\"manufacturer\":\"Linak\", \"height\":\"75\"}"),
       new Date('2025-10-07T13:10'), new Date('2025-10-07T13:00'), new Date('2025-10-07T04:10')
     )
     console.log('Created desks:', { desk1, desk2, desk3, desk4, desk5 });

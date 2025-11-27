@@ -10,6 +10,7 @@ export const getAllDesks = async (req: Request, res: Response) => {
     const desks = await prisma.desk.findMany({
       include: { controller: true },
     })
+    
     res.json({ success: true, data: desks })
   } catch (error) {
     console.error("Error fetching desks:", error)

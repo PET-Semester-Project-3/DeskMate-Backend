@@ -1,3 +1,4 @@
+import { JsonObject } from '@prisma/client/runtime/library';
 import { prisma } from '../src/db/prisma';
 import { ScheduledTaskStatus } from '../src/generated/prisma/enums';
 import { JsonNullValueInput } from '../src/generated/prisma/internal/prismaNamespace';
@@ -31,7 +32,7 @@ export async function createUser(
 }
 
 export async function createDesk(
-id: string, controller_id: string | null, name: string, is_locked: boolean, last_data: string, last_data_at: Date, created_at: Date, updated_at: Date) {
+id: string, controller_id: string | null, name: string, is_locked: boolean, last_data: JsonObject, last_data_at: Date, created_at: Date, updated_at: Date) {
   const desk = await prisma.desk.upsert({
     where: { id: id },
     update: {
