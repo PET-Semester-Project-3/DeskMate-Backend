@@ -14,6 +14,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
         email: true,
         created_at: true,
         updated_at: true,
+        main_desk_id: true
       },
     })
     res.json({ success: true, data: users })
@@ -81,7 +82,7 @@ export const getUserById = async (req: Request, res: Response) => {
  */
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body
+    const { email, password, main_desk_id } = req.body
     if (!email || !password)
       return res
         .status(400)
@@ -91,10 +92,14 @@ export const createUser = async (req: Request, res: Response) => {
     if (existingUser)
       return res.status(409).json({ success: false, message: "User exists" })
 
+    const existingMainDeskUser = await prisma.user.findUnique({ where: { main_desk_id } })
+    if (existingMainDeskUser)
+      return res.status(409).json({ success: false, message: "Main Desk User exists" })
+
     const hashedPassword = await bcrypt.hash(password, 10)
     const user = await prisma.user.create({
-      data: { email, password_hash: hashedPassword },
-      select: { id: true, email: true, created_at: true, updated_at: true },
+      data: { email, password_hash: hashedPassword, main_desk_id: main_desk_id },
+      select: { id: true, email: true, created_at: true, updated_at: true, main_desk_id: true },
     })
 
     res.status(201).json({ success: true, data: user })
@@ -112,7 +117,7 @@ export const createUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
-    const { email, password } = req.body
+    const { email, password, main_desk_id } = req.body
 
     const existingUser = await prisma.user.findUnique({ where: { id } })
     if (!existingUser)
@@ -124,14 +129,19 @@ export const updateUser = async (req: Request, res: Response) => {
         return res.status(409).json({ success: false, message: "Email already in use" })
     }
 
+    const existingMainDeskUser = await prisma.user.findUnique({ where: { main_desk_id } })
+    if (existingMainDeskUser)
+      return res.status(409).json({ success: false, message: "Main Desk User exists" })
+
     const updateData: any = {}
     if (email) updateData.email = email
     if (password) updateData.password_hash = await bcrypt.hash(password, 10)
+    if (main_desk_id) updateData.main_desk_id = main_desk_id
 
     const user = await prisma.user.update({
       where: { id },
       data: updateData,
-      select: { id: true, email: true, created_at: true, updated_at: true },
+      select: { id: true, email: true, created_at: true, updated_at: true, main_desk_id: true },
     })
 
     res.json({ success: true, data: user })
@@ -157,6 +167,35 @@ export const deleteUser = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error deleting user:", error)
     res.status(500).json({ success: false, message: "Failed to delete user" })
+  }
+}
+
+/**
+ * Get user's desks
+ * GET /api/users/:id/desk
+ */
+export const getUserDesk = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    const user = await prisma.user.findFirst({
+      where: { id: id }
+    })
+    
+    if (!user!.main_desk_id)
+      return res.status(404).json({ success: false, message: "User has no main desk set" })
+
+    const desk = await prisma.userDesk.findFirst({
+      where: { id: user?.main_desk_id },
+      include: {
+        desk: {
+          include: { controller: true },
+        },
+      },
+    })
+    res.json({ success: true, data: desk })
+  } catch (error) {
+    console.error("Error fetching user desks:", error)
+    res.status(500).json({ success: false, message: "Failed to fetch user desk" })
   }
 }
 

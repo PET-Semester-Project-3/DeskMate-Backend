@@ -68,7 +68,6 @@ export const createDesk = async (req: Request, res: Response) => {
         id,
         controller_id: controllerId,
         name,
-        manufacturer,
         is_locked: !!is_locked,
         last_data: last_data ?? {},
       },

@@ -18,9 +18,9 @@ model User {
   id            String     @id @default(uuid())
   email         String     @unique @db.VarChar(50)
   password_hash String
+  main_desk_id  String?    @unique
   created_at    DateTime   @default(now())
   updated_at    DateTime?  @updatedAt
-  main_desk_id  String?
   userDesks     UserDesk[]
   scheduledTasks ScheduledTask[]
   userPermissions UserPermission[]
