@@ -24,6 +24,7 @@ model User {
   userDesks     UserDesk[]
   scheduledTasks ScheduledTask[]
   userPermissions UserPermission[]
+  deskMate DeskMate?
 }
 
 model Desk {
@@ -98,4 +99,15 @@ enum ScheduledTaskStatus {
   COMPLETED
   CANCELLED
   FAILED
+}
+
+model DeskMate{
+  id String @id @default(uuid())
+  user_id String @unique
+  name String
+  streak Int @default(0)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+  achievements String[]
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }

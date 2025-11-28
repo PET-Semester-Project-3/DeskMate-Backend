@@ -1,6 +1,8 @@
 import { Request, Response } from "express"
 import { prisma } from "../db/prisma"
 
+// #region GetAll
+
 /**
  * Get all desks
  * GET /api/desks
@@ -17,6 +19,10 @@ export const getAllDesks = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch desks" })
   }
 }
+
+// #endregion
+
+// #region Get
 
 /**
  * Get desk by ID (includes controller, users via userDesks, scheduled tasks)
@@ -41,6 +47,10 @@ export const getDeskById = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch desk" })
   }
 }
+
+// #endregion
+
+// #region Create
 
 /**
  * Create a new desk
@@ -80,6 +90,10 @@ export const createDesk = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to create desk" })
   }
 }
+
+// #endregion
+
+// #region Update
 
 /**
  * Update desk
@@ -123,6 +137,10 @@ export const updateDesk = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Delete
+
 /**
  * Delete desk
  * DELETE /api/desks/:id
@@ -142,6 +160,10 @@ export const deleteDesk = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Get Desk Users
+
 /**
  * Get desk users
  * GET /api/desks/:id/users
@@ -159,6 +181,10 @@ export const getDeskUsers = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch desk users" })
   }
 }
+
+// #endregion
+
+// #region Add To User
 
 /**
  * Add user to desk
@@ -193,6 +219,10 @@ export const addUserToDesk = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Remove From User
+
 /**
  * Remove user from desk
  * DELETE /api/desks/:id/users/:userId
@@ -212,6 +242,10 @@ export const removeUserFromDesk = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Get Schedule
+
 /**
  * Get desk scheduled tasks
  * GET /api/desks/:id/scheduled-tasks
@@ -229,6 +263,10 @@ export const getDeskScheduledTasks = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch scheduled tasks" })
   }
 }
+
+// #endregion
+
+// #region Lock / Unlock
 
 /**
  * Lock/Unlock desk
@@ -256,3 +294,5 @@ export const unlockDesk = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to unlock desk" })
   }
 }
+
+// #endregion

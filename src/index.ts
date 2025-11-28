@@ -8,6 +8,7 @@ import permissionRoutes from "./routes/permissionRoutes"
 import controllerRoutes from "./routes/controllerRoutes"
 import userDeskRoutes from "./routes/userDeskRoutes"
 import userPermissionRoutes from "./routes/userPermissionRoutes"
+import deskMateRoutes from "./routes/deskMateRoutes"
 
 dotenv.config()
 
@@ -45,6 +46,7 @@ app.use("/api/permissions", permissionRoutes)
 app.use("/api/controllers", controllerRoutes)
 app.use("/api/user-desks", userDeskRoutes)
 app.use("/api/user-permissions", userPermissionRoutes)
+app.use("/api/deskmate", deskMateRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`)

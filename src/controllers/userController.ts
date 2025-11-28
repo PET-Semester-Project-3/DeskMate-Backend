@@ -2,6 +2,8 @@ import { Request, Response } from "express"
 import { prisma } from "../db/prisma"
 import bcrypt from "bcryptjs"
 
+// #region GetAll
+
 /**
  * Get all users
  * GET /api/users
@@ -23,6 +25,10 @@ export const getAllUsers = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch users" })
   }
 }
+
+// #endregion
+
+// #region Get
 
 /**
  * Get user by ID (all user scalars + all related records)
@@ -75,6 +81,10 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Create
+
 /**
  * Create a new user
  * POST /api/users
@@ -108,6 +118,10 @@ export const createUser = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to create user" })
   }
 }
+
+// #endregion
+
+// #region Update
 
 /**
  * Update user
@@ -151,6 +165,10 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Delete
+
 /**
  * Delete user
  * DELETE /api/users/:id
@@ -169,6 +187,10 @@ export const deleteUser = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to delete user" })
   }
 }
+
+// #endregion
+
+// #region Get (Main) Desk
 
 /**
  * Get user's desks
@@ -199,6 +221,10 @@ export const getUserDesk = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Get Desks
+
 /**
  * Get user's desks
  * GET /api/users/:id/desks
@@ -220,6 +246,10 @@ export const getUserDesks = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch user desks" })
   }
 }
+
+// #endregion
+
+// #region Add To Desk
 
 /**
  * Add user to desk
@@ -254,6 +284,10 @@ export const addUserToDesk = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Remove From Desk
+
 /**
  * Remove user from desk
  * DELETE /api/users/:id/desks/:deskId
@@ -273,6 +307,10 @@ export const removeUserFromDesk = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Get Permissions
+
 /**
  * Get user permissions
  * GET /api/users/:id/permissions
@@ -291,6 +329,10 @@ export const getUserPermissions = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch user permissions" })
   }
 }
+
+// #endregion
+
+// #region Add Permission To User
 
 /**
  * Add permission to user
@@ -329,6 +371,10 @@ export const addPermissionToUser = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Remove Permission From User
+
 /**
  * Remove permission from user
  * DELETE /api/users/:id/permissions/:permissionId
@@ -350,6 +396,10 @@ export const removePermissionFromUser = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Get Schedule
+
 /**
  * Get user's scheduled tasks
  * GET /api/users/:id/scheduled-tasks
@@ -370,6 +420,10 @@ export const getUserScheduledTasks = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch scheduled tasks" })
   }
 }
+
+// #endregion
+
+// #region Change Password
 
 /**
  * Change password
@@ -403,6 +457,10 @@ export const changePassword = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to change password" })
   }
 }
+
+// #endregion
+
+// #region Login
 
 /**
  * Login user
@@ -439,3 +497,5 @@ export const loginUser = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to login" })
   }
 }
+
+// #endregion

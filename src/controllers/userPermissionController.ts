@@ -1,6 +1,8 @@
 import { Request, Response } from "express"
 import { prisma } from "../db/prisma"
 
+// #region GetAll
+
 export const getAllUserPermissions = async (req: Request, res: Response) => {
   try {
     const relations = await prisma.userPermission.findMany({
@@ -15,6 +17,10 @@ export const getAllUserPermissions = async (req: Request, res: Response) => {
       .json({ success: false, message: "Failed to fetch user-permission relations" })
   }
 }
+
+// #endregion
+
+// #region Get
 
 export const getUserPermissionById = async (req: Request, res: Response) => {
   try {
@@ -33,6 +39,10 @@ export const getUserPermissionById = async (req: Request, res: Response) => {
       .json({ success: false, message: "Failed to fetch user-permission relation" })
   }
 }
+
+// #endregion
+
+// #region Create
 
 export const createUserPermission = async (req: Request, res: Response) => {
   try {
@@ -67,6 +77,10 @@ export const createUserPermission = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to create relation" })
   }
 }
+
+// #endregion
+
+// #region Update
 
 export const updateUserPermission = async (req: Request, res: Response) => {
   try {
@@ -105,6 +119,10 @@ export const updateUserPermission = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Delete
+
 export const deleteUserPermission = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
@@ -118,3 +136,5 @@ export const deleteUserPermission = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to delete relation" })
   }
 }
+
+// #endregion
