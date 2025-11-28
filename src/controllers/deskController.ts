@@ -59,13 +59,13 @@ export const getDeskById = async (req: Request, res: Response) => {
  */
 export const createDesk = async (req: Request, res: Response) => {
   try {
-    const { id, controllerId, name, manufacturer, is_locked, last_data } = req.body
-    if (!id || !name || !manufacturer)
+    const { id, controllerId, name, is_locked, last_data } = req.body
+    if (!id || !name)
       return res
         .status(400)
         .json({
           success: false,
-          message: "id, name and manufacturer required",
+          message: "id and name required",
         })
     
     if (controllerId){
@@ -103,7 +103,7 @@ export const createDesk = async (req: Request, res: Response) => {
 export const updateDesk = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
-    const { controllerId, name, manufacturer, is_locked, last_data, height, is_online } = req.body
+    const { controllerId, name, is_locked, last_data, is_online } = req.body
 
     const existing = await prisma.desk.findUnique({ where: { id } })
     if (!existing)
@@ -119,10 +119,8 @@ export const updateDesk = async (req: Request, res: Response) => {
       data.controller_id = controllerId
     }
     if (name !== undefined) data.name = name
-    if (manufacturer !== undefined) data.manufacturer = manufacturer``
     if (is_locked !== undefined) data.is_locked = is_locked
     if (last_data !== undefined) data.last_data = last_data
-    if (height !== undefined) data.height = height
     if (is_online !== undefined) data.is_online = is_online
 
     const desk = await prisma.desk.update({

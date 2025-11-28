@@ -9,16 +9,16 @@ import { prisma } from "../db/prisma"
  */
 export const getAllDeskMates = async (req: Request, res: Response) => {
   try {
-    const relations = await prisma.deskMate.findMany({
+    const deskmates = await prisma.deskMate.findMany({
       include: { user: true },
     })
 
-    res.json({ success: true, data: relations })
+    res.json({ success: true, data: deskmates })
   } catch (error) {
     console.error("Error fetching deskmate relations:", error)
     res
       .status(500)
-      .json({ success: false, message: "Failed to fetch deskmate relations" })
+      .json({ success: false, message: "Failed to fetch deskmate" })
   }
 }
 
@@ -33,18 +33,18 @@ export const getAllDeskMates = async (req: Request, res: Response) => {
 export const getDeskMateById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
-    const rel = await prisma.deskMate.findUnique({
+    const deskmate = await prisma.deskMate.findUnique({
       where: { id },
       include: { user: true },
     })
-    if (!rel)
+    if (!deskmate)
       return res.status(404).json({ success: false, message: "deskmate not found" })
-    res.json({ success: true, data: rel })
+    res.json({ success: true, data: deskmate })
   } catch (error) {
     console.error("Error fetching deskmate relation:", error)
     res
       .status(500)
-      .json({ success: false, message: "Failed to fetch deskmate relation" })
+      .json({ success: false, message: "Failed to fetch deskmate" })
   }
 }
 
@@ -76,11 +76,11 @@ export const createDeskMate = async (req: Request, res: Response) => {
     if (exists)
       return res.status(409).json({ success: false, message: "DeskMate already exists" })
 
-    const rel = await prisma.deskMate.create({
+    const deskmate = await prisma.deskMate.create({
       data: { user_id: userId, name: name },
       include: { user: true },
     })
-    res.status(201).json({ success: true, data: rel })
+    res.status(201).json({ success: true, data: deskmate })
   } catch (error) {
     console.error("Error creating deskmate:", error)
     res.status(500).json({ success: false, message: "Failed to create deskmate" })
