@@ -181,3 +181,29 @@ export const updateDeskMateStreak = async (req: Request, res: Response) => {
 }
 
 // #endregion
+
+// #region Get
+
+/**
+ * Get a specific DeskMate from User ID
+ * GET /api/deskmate/user/:id
+ */
+export const getDeskMateByUserId = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    const deskmate = await prisma.deskMate.findUnique({
+      where: { user_id: id },
+      include: { user: true },
+    })
+    if (!deskmate)
+      return res.status(404).json({ success: false, message: "deskmate not found" })
+    res.json({ success: true, data: deskmate })
+  } catch (error) {
+    console.error("Error fetching deskmate relation:", error)
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch deskmate" })
+  }
+}
+
+// #endregion

@@ -5,27 +5,31 @@ import {
   createDeskMate,
   updateDeskMate,
   deleteDeskMate,
-  updateDeskMateStreak
+  updateDeskMateStreak,
+  getDeskMateByUserId
 } from "../controllers/deskMateController"
 
 const router = Router()
 
-// GET /api/desks
+// GET /api/deskmates
 router.get("/", getAllDeskMates)
 
-// GET /api/desks/:id
+// GET /api/deskmates/:id
 router.get("/:id", getDeskMateById)
 
-// POST /api/desks
+// POST /api/deskmates
 router.post("/", createDeskMate)
 
-// PUT /api/desks/:id
+// PUT /api/deskmates/:id
 router.put("/:id", updateDeskMate)
 
-// DELETE /api/desks/:id
+// DELETE /api/deskmates/:id
 router.delete("/:id", deleteDeskMate)
 
-// PUT /api/desks/:id/streak
+// PUT /api/deskmates/:id/streak
 router.put("/:id/streak", updateDeskMateStreak)
+
+// Get /api/deskmates/:id
+router.put("/:id", getDeskMateByUserId)
 
 export default router
