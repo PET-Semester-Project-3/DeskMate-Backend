@@ -121,7 +121,7 @@ export const createUser = async (req: Request, res: Response) => {
 
 // #endregion
 
-// #region Update
+// #region Create With Permissions
 
 /**
  * Create a new user and optionally assign permissions in a single transaction
@@ -180,6 +180,10 @@ export const createUserWithPermissions = async (req: Request, res: Response) => 
   }
 }
 
+// #endregion
+
+// #region Update
+
 /**
  * Update user
  * PUT /api/users/:id
@@ -200,9 +204,11 @@ export const updateUser = async (req: Request, res: Response) => {
         return res.status(409).json({ success: false, message: "Email already in use" })
     }
 
-    const existingMainDeskUser = await prisma.user.findUnique({ where: { main_desk_id } })
-    if (existingMainDeskUser)
-      return res.status(409).json({ success: false, message: "Main Desk User exists" })
+    if (main_desk_id){
+      const existingMainDeskUser = await prisma.user.findUnique({ where: { main_desk_id } })
+      if (existingMainDeskUser && existingMainDeskUser.id != id)
+        return res.status(409).json({ success: false, message: "Main Desk User exists" })
+    }
 
     const updateData: any = {}
     if (email) updateData.email = email
@@ -212,7 +218,7 @@ export const updateUser = async (req: Request, res: Response) => {
     const user = await prisma.user.update({
       where: { id },
       data: updateData,
-      select: { id: true, email: true, created_at: true, updated_at: true, main_desk_id: true },
+      select: { id: true, email: true, created_at: true, updated_at: true, main_desk_id: true, password_hash: true },
     })
 
     res.json({ success: true, data: user })
@@ -490,19 +496,29 @@ export const changePassword = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
     const { currentPassword, newPassword } = req.body
-    if (!currentPassword || !newPassword)
+    if (!newPassword)
       return res
         .status(400)
-        .json({ success: false, message: "current and new passwords required" })
+        .json({ success: false, message: "new password required" })
 
     const user = await prisma.user.findUnique({ where: { id } })
     if (!user) return res.status(404).json({ success: false, message: "User not found" })
 
-    const match = await bcrypt.compare(currentPassword, user.password_hash)
-    if (!match)
-      return res
-        .status(401)
-        .json({ success: false, message: "Current password incorrect" })
+    if (user.password_hash == ""){
+      if (currentPassword != "")
+        return res
+          .status(401)
+          .json({ success: false, message: "Current password incorrect" })
+    }
+    else {
+      const match = await bcrypt.compare(currentPassword, user.password_hash)
+      if (!match)
+        return res
+          .status(401)
+          .json({ success: false, message: "Current password incorrect" })
+    }
+
+    
 
     const hashed = await bcrypt.hash(newPassword, 10)
     await prisma.user.update({ where: { id }, data: { password_hash: hashed } })
@@ -526,10 +542,10 @@ export const changePassword = async (req: Request, res: Response) => {
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body
-    if (!email || !password)
+    if (!email)
       return res
         .status(400)
-        .json({ success: false, message: "Email and password required" })
+        .json({ success: false, message: "Email is required" })
 
     const user = await prisma.user.findUnique({ where: { email } })
     if (!user)
@@ -537,11 +553,20 @@ export const loginUser = async (req: Request, res: Response) => {
         .status(401)
         .json({ success: false, message: "Invalid email or password" })
 
-    const match = await bcrypt.compare(password, user.password_hash)
-    if (!match)
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid email or password" })
+    if (user.password_hash == "") {
+      if (password != "")
+        return res
+          .status(401)
+          .json({ success: false, message: "Invalid email or password" })
+    }
+    else {
+      const match = await bcrypt.compare(password, user.password_hash)
+      if (!match)
+        return res
+          .status(401)
+          .json({ success: false, message: "Invalid email or password" })
+    }
+    
 
     // strip sensitive field
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
