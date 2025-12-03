@@ -3,6 +3,7 @@ import {
   getAllUsers,
   getUserById,
   createUser,
+  createUserWithPermissions,
   updateUser,
   deleteUser,
   getUserDesks,
@@ -26,6 +27,9 @@ router.get("/", getAllUsers)
 
 // POST /api/users - Create new user
 router.post("/", createUser)
+
+// POST /api/users/with-permissions - Create new user and assign permissions atomically
+router.post("/with-permissions", createUserWithPermissions)
 
 // POST /api/users/login - Login
 router.post("/login", loginUser)
