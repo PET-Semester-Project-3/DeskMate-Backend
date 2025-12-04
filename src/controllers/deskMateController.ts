@@ -167,6 +167,7 @@ export const updateDeskMateStreak = async (req: Request, res: Response) => {
 
     const data: any = {}
     data.streak = ++data.streak;
+    data.last_streak = new Date();
 
     const updated = await prisma.deskMate.update({
       where: { id },
