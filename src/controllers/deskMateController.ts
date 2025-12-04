@@ -182,7 +182,7 @@ export const updateDeskMateStreak = async (req: Request, res: Response) => {
 
 // #endregion
 
-// #region Get
+// #region Get By User
 
 /**
  * Get a specific DeskMate from User ID

@@ -139,6 +139,34 @@ export async function createScheduledTask(
   return scheduledTask;
 }
 
+export async function createDeskmate(
+    id: string, user_id: string, name:string, streak:number,
+    last_streak:Date, created_at:Date, updated_at:Date
+) {
+  const deskmate = await prisma.deskMate.upsert({
+    where: { id: id },
+    update: {
+      id,
+      user_id,
+      name,
+      streak,
+      last_streak,
+      created_at,
+      updated_at,
+    },
+    create: {
+      id,
+      user_id,
+      name,
+      streak,
+      last_streak,
+      created_at,
+      updated_at,
+    },
+  });
+  return deskmate;
+}
+
 //#endregion
 
 //#region Create Relation Objects

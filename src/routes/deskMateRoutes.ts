@@ -30,6 +30,6 @@ router.delete("/:id", deleteDeskMate)
 router.put("/:id/streak", updateDeskMateStreak)
 
 // Get /api/deskmates/:id
-router.get("/:id", getDeskMateByUserId)
+router.get("/user/:id", getDeskMateByUserId)
 
 export default router

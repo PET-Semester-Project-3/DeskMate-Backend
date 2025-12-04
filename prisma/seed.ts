@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { prisma } from '../src/db/prisma';
-import { createUser, createDesk, createPermission, createUserToDesk, createUserToPermission, createController, createScheduledTask } from './creationMethods'
+import { createUser, createDesk, createPermission, createUserToDesk, createUserToPermission, createController, createScheduledTask, createDeskmate } from './creationMethods'
 import { JsonNullValueInput } from '../src/generated/prisma/internal/prismaNamespace';
 import { ScheduledTaskStatus } from '../src/generated/prisma/enums';
 
@@ -10,7 +10,7 @@ dotenv.config();
 
 async function main() {
 
-  const isClear = false;
+  const isClear = true;
 
   const isCreateUsers = true;
   const isCreateControllers = true;
@@ -19,6 +19,9 @@ async function main() {
   const isCreateScheduledTask = true;
   const isCreateUserToDeskRelations = true;
   const isCreateUserToPermissionsRelations = true;
+
+  const isDeskMates = true;
+
 
   console.log('Start seeding...');
 
@@ -30,6 +33,7 @@ async function main() {
     await prisma.permission.deleteMany();
     await prisma.desk.deleteMany();
     await prisma.user.deleteMany();
+    await prisma.deskMate.deleteMany();
     console.log('Existing data cleared.');
   }
 
@@ -164,6 +168,15 @@ async function main() {
     const userToPermissionRelation8 = await createUserToPermission('b2006760-9254-41d5-b87a-b9459b1c0654', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', '140898c7-2e9c-471d-88eb-7b1b277cb880', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     const userToPermissionRelation9 = await createUserToPermission('4416141b-a319-4f99-bad6-857388af34ec', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', 'ec95035b-99f2-4752-9911-c93387ff6cd9', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     console.log('Created UserToPermission relations:', { userToPermissionRelation1, userToPermissionRelation2, userToPermissionRelation3, userToPermissionRelation4, userToPermissionRelation5, userToPermissionRelation6, userToPermissionRelation7, userToPermissionRelation8, userToPermissionRelation9 });
+  }
+
+  // Create demo Deskmates
+  if (isCreateUserToPermissionsRelations) {
+    console.log('Creating demo UserToPermission relations...');
+    const deskmate1 = await createDeskmate('dd47b424-4c1c-4cc4-85e1-8e509c27ba56', 'd812baf1-1d50-4c83-ad2e-d65dd1d0dce2', 'Jhonny', 5 , new Date(Date.now()), new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const deskmate2 = await createDeskmate('c13b5aae-d147-45c0-95c7-f8443ef0c884', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', 'Carl', 12, new Date(Date.now() - (3 * 1000 * 3600 * 24)), new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const deskmate3 = await createDeskmate('e369503d-f725-49dd-88f6-fae9f9221c88', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', 'Ron', 2, new Date(Date.now() - (6 * 1000 * 3600 * 24)), new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    console.log('Created Deskmates:', { deskmate1, deskmate2, deskmate3 });
   }
 
   console.log('Seeding finished.');
