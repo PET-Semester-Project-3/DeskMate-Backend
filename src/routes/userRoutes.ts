@@ -7,6 +7,7 @@ import {
   updateUser,
   deleteUser,
   getUserDesks,
+  getUserDesk,
   addUserToDesk,
   removeUserFromDesk,
   getUserPermissions,
@@ -40,6 +41,7 @@ router.put("/:id", updateUser)
 router.delete("/:id", deleteUser)
 
 // User desks
+router.get("/:id/desk", getUserDesk)
 router.get("/:id/desks", getUserDesks)
 router.post("/:id/desks", addUserToDesk)
 router.delete("/:id/desks/:deskId", removeUserFromDesk)

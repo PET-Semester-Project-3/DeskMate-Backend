@@ -18,20 +18,20 @@ model User {
   id            String     @id @default(uuid())
   email         String     @unique @db.VarChar(50)
   password_hash String
+  main_desk_id  String?    @unique
   created_at    DateTime   @default(now())
-  updated_at    DateTime?   @updatedAt
+  updated_at    DateTime?  @updatedAt
   userDesks     UserDesk[]
   scheduledTasks ScheduledTask[]
   userPermissions UserPermission[]
+  deskMate DeskMate?
 }
 
 model Desk {
   id           String     @id 
   controller_id String?
   name         String     @db.VarChar(50)
-  manufacturer String     @db.VarChar(50)
   is_locked    Boolean    @default(false)
-  height       Int        @default(75)
   is_online    Boolean    @default(false)
   last_data    Json       @default("{}") @db.JsonB
   last_data_at DateTime   @default(now())
@@ -99,4 +99,16 @@ enum ScheduledTaskStatus {
   COMPLETED
   CANCELLED
   FAILED
+}
+
+model DeskMate{
+  id String @id @default(uuid())
+  user_id String @unique
+  name String
+  streak Int @default(0)
+  last_streak DateTime?
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+  achievements String[]
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }

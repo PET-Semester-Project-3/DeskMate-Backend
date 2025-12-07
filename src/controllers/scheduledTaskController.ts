@@ -1,6 +1,8 @@
 import { Request, Response } from "express"
 import { prisma } from "../db/prisma"
 
+// #region GetAll
+
 /**
  * Get scheduled tasks
  * GET /api/scheduled-tasks
@@ -27,6 +29,10 @@ export const getAllScheduledTasks = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Get
+
 /**
  * Get scheduled task by ID
  * GET /api/scheduled-tasks/:id
@@ -48,6 +54,10 @@ export const getScheduledTaskById = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch scheduled task" })
   }
 }
+
+// #endregion
+
+// #region Create
 
 /**
  * Create scheduled task
@@ -100,6 +110,10 @@ export const createScheduledTask = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Update
+
 /**
  * Update scheduled task
  * PUT /api/scheduled-tasks/:id
@@ -136,6 +150,10 @@ export const updateScheduledTask = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Delete
+
 /**
  * Delete scheduled task
  * DELETE /api/scheduled-tasks/:id
@@ -155,6 +173,10 @@ export const deleteScheduledTask = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to delete scheduled task" })
   }
 }
+
+// #endregion
+
+// #region Start Task
 
 /**
  * Convenience actions for task lifecycle
@@ -178,6 +200,10 @@ export const startScheduledTask = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Complete Task
+
 export const completeScheduledTask = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
@@ -193,6 +219,10 @@ export const completeScheduledTask = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Cancel Task
+
 export const cancelScheduledTask = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
@@ -207,6 +237,10 @@ export const cancelScheduledTask = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to cancel scheduled task" })
   }
 }
+
+// #endregion
+
+// #region Fail Task
 
 export const failScheduledTask = async (req: Request, res: Response) => {
   try {
@@ -225,3 +259,5 @@ export const failScheduledTask = async (req: Request, res: Response) => {
       .json({ success: false, message: "Failed to mark scheduled task as failed" })
   }
 }
+
+// #endregion

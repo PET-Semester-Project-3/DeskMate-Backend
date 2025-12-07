@@ -1,6 +1,8 @@
 import { Request, Response } from "express"
 import { prisma } from "../db/prisma"
 
+// #region GetAll
+
 /**
  * Get all desks
  * GET /api/desks
@@ -10,12 +12,17 @@ export const getAllDesks = async (req: Request, res: Response) => {
     const desks = await prisma.desk.findMany({
       include: { controller: true },
     })
+    
     res.json({ success: true, data: desks })
   } catch (error) {
     console.error("Error fetching desks:", error)
     res.status(500).json({ success: false, message: "Failed to fetch desks" })
   }
 }
+
+// #endregion
+
+// #region Get
 
 /**
  * Get desk by ID (includes controller, users via userDesks, scheduled tasks)
@@ -41,6 +48,10 @@ export const getDeskById = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Create
+
 /**
  * Create a new desk
  * POST /api/desks
@@ -48,13 +59,13 @@ export const getDeskById = async (req: Request, res: Response) => {
  */
 export const createDesk = async (req: Request, res: Response) => {
   try {
-    const { id, controllerId, name, manufacturer, is_locked, last_data } = req.body
-    if (!id || !name || !manufacturer)
+    const { id, controllerId, name, is_locked, last_data } = req.body
+    if (!id || !name)
       return res
         .status(400)
         .json({
           success: false,
-          message: "id, name and manufacturer required",
+          message: "id and name required",
         })
     
     if (controllerId){
@@ -68,7 +79,6 @@ export const createDesk = async (req: Request, res: Response) => {
         id,
         controller_id: controllerId,
         name,
-        manufacturer,
         is_locked: !!is_locked,
         last_data: last_data ?? {},
       },
@@ -81,6 +91,10 @@ export const createDesk = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Update
+
 /**
  * Update desk
  * PUT /api/desks/:id
@@ -89,7 +103,7 @@ export const createDesk = async (req: Request, res: Response) => {
 export const updateDesk = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
-    const { controllerId, name, manufacturer, is_locked, last_data, height, is_online } = req.body
+    const { controllerId, name, is_locked, last_data, is_online } = req.body
 
     const existing = await prisma.desk.findUnique({ where: { id } })
     if (!existing)
@@ -105,10 +119,8 @@ export const updateDesk = async (req: Request, res: Response) => {
       data.controller_id = controllerId
     }
     if (name !== undefined) data.name = name
-    if (manufacturer !== undefined) data.manufacturer = manufacturer``
     if (is_locked !== undefined) data.is_locked = is_locked
     if (last_data !== undefined) data.last_data = last_data
-    if (height !== undefined) data.height = height
     if (is_online !== undefined) data.is_online = is_online
 
     const desk = await prisma.desk.update({
@@ -122,6 +134,10 @@ export const updateDesk = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to update desk" })
   }
 }
+
+// #endregion
+
+// #region Delete
 
 /**
  * Delete desk
@@ -142,6 +158,10 @@ export const deleteDesk = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Get Desk Users
+
 /**
  * Get desk users
  * GET /api/desks/:id/users
@@ -159,6 +179,10 @@ export const getDeskUsers = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch desk users" })
   }
 }
+
+// #endregion
+
+// #region Add To User
 
 /**
  * Add user to desk
@@ -193,6 +217,10 @@ export const addUserToDesk = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Remove From User
+
 /**
  * Remove user from desk
  * DELETE /api/desks/:id/users/:userId
@@ -212,6 +240,10 @@ export const removeUserFromDesk = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Get Schedule
+
 /**
  * Get desk scheduled tasks
  * GET /api/desks/:id/scheduled-tasks
@@ -229,6 +261,10 @@ export const getDeskScheduledTasks = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch scheduled tasks" })
   }
 }
+
+// #endregion
+
+// #region Lock / Unlock
 
 /**
  * Lock/Unlock desk
@@ -256,3 +292,5 @@ export const unlockDesk = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to unlock desk" })
   }
 }
+
+// #endregion

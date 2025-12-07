@@ -2,6 +2,8 @@ import { Request, Response } from "express"
 import { prisma } from "../db/prisma"
 import bcrypt from "bcryptjs"
 
+// #region GetAll
+
 /**
  * Get all users
  * GET /api/users
@@ -14,6 +16,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
         email: true,
         created_at: true,
         updated_at: true,
+        main_desk_id: true
       },
     })
     res.json({ success: true, data: users })
@@ -22,6 +25,10 @@ export const getAllUsers = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch users" })
   }
 }
+
+// #endregion
+
+// #region Get
 
 /**
  * Get user by ID (all user scalars + all related records)
@@ -74,6 +81,10 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Create
+
 /**
  * Create a new user
  * POST /api/users
@@ -81,7 +92,7 @@ export const getUserById = async (req: Request, res: Response) => {
  */
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body
+    const { email, password, main_desk_id } = req.body
     if (!email || !password)
       return res
         .status(400)
@@ -91,10 +102,14 @@ export const createUser = async (req: Request, res: Response) => {
     if (existingUser)
       return res.status(409).json({ success: false, message: "User exists" })
 
+    const existingMainDeskUser = await prisma.user.findUnique({ where: { main_desk_id } })
+    if (existingMainDeskUser)
+      return res.status(409).json({ success: false, message: "Main Desk User exists" })
+
     const hashedPassword = await bcrypt.hash(password, 10)
     const user = await prisma.user.create({
-      data: { email, password_hash: hashedPassword },
-      select: { id: true, email: true, created_at: true, updated_at: true },
+      data: { email, password_hash: hashedPassword, main_desk_id: main_desk_id },
+      select: { id: true, email: true, created_at: true, updated_at: true, main_desk_id: true },
     })
 
     res.status(201).json({ success: true, data: user })
@@ -103,6 +118,10 @@ export const createUser = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to create user" })
   }
 }
+
+// #endregion
+
+// #region Create With Permissions
 
 /**
  * Create a new user and optionally assign permissions in a single transaction
@@ -161,6 +180,10 @@ export const createUserWithPermissions = async (req: Request, res: Response) => 
   }
 }
 
+// #endregion
+
+// #region Update
+
 /**
  * Update user
  * PUT /api/users/:id
@@ -169,7 +192,7 @@ export const createUserWithPermissions = async (req: Request, res: Response) => 
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
-    const { email, password } = req.body
+    const { email, password, main_desk_id } = req.body
 
     const existingUser = await prisma.user.findUnique({ where: { id } })
     if (!existingUser)
@@ -181,14 +204,21 @@ export const updateUser = async (req: Request, res: Response) => {
         return res.status(409).json({ success: false, message: "Email already in use" })
     }
 
+    if (main_desk_id){
+      const existingMainDeskUser = await prisma.user.findUnique({ where: { main_desk_id } })
+      if (existingMainDeskUser && existingMainDeskUser.id != id)
+        return res.status(409).json({ success: false, message: "Main Desk User exists" })
+    }
+
     const updateData: any = {}
     if (email) updateData.email = email
     if (password) updateData.password_hash = await bcrypt.hash(password, 10)
+    if (main_desk_id) updateData.main_desk_id = main_desk_id
 
     const user = await prisma.user.update({
       where: { id },
       data: updateData,
-      select: { id: true, email: true, created_at: true, updated_at: true },
+      select: { id: true, email: true, created_at: true, updated_at: true, main_desk_id: true, password_hash: true },
     })
 
     res.json({ success: true, data: user })
@@ -197,6 +227,10 @@ export const updateUser = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to update user" })
   }
 }
+
+// #endregion
+
+// #region Delete
 
 /**
  * Delete user
@@ -216,6 +250,43 @@ export const deleteUser = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to delete user" })
   }
 }
+
+// #endregion
+
+// #region Get (Main) Desk
+
+/**
+ * Get user's desks
+ * GET /api/users/:id/desk
+ */
+export const getUserDesk = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    const user = await prisma.user.findFirst({
+      where: { id: id }
+    })
+    
+    if (!user!.main_desk_id)
+      return res.status(404).json({ success: false, message: "User has no main desk set" })
+
+    const desk = await prisma.userDesk.findFirst({
+      where: { id: user?.main_desk_id },
+      include: {
+        desk: {
+          include: { controller: true },
+        },
+      },
+    })
+    res.json({ success: true, data: desk })
+  } catch (error) {
+    console.error("Error fetching user desks:", error)
+    res.status(500).json({ success: false, message: "Failed to fetch user desk" })
+  }
+}
+
+// #endregion
+
+// #region Get Desks
 
 /**
  * Get user's desks
@@ -238,6 +309,10 @@ export const getUserDesks = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch user desks" })
   }
 }
+
+// #endregion
+
+// #region Add To Desk
 
 /**
  * Add user to desk
@@ -272,6 +347,10 @@ export const addUserToDesk = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Remove From Desk
+
 /**
  * Remove user from desk
  * DELETE /api/users/:id/desks/:deskId
@@ -291,6 +370,10 @@ export const removeUserFromDesk = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Get Permissions
+
 /**
  * Get user permissions
  * GET /api/users/:id/permissions
@@ -308,6 +391,10 @@ export const getUserPermissions = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch user permissions" })
   }
 }
+
+// #endregion
+
+// #region Add Permission To User
 
 /**
  * Add permission to user
@@ -346,6 +433,10 @@ export const addPermissionToUser = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Remove Permission From User
+
 /**
  * Remove permission from user
  * DELETE /api/users/:id/permissions/:permissionId
@@ -366,6 +457,10 @@ export const removePermissionFromUser = async (req: Request, res: Response) => {
       .json({ success: false, message: "Failed to remove permission from user" })
   }
 }
+
+// #endregion
+
+// #region Get Schedule
 
 /**
  * Get user's scheduled tasks
@@ -388,6 +483,10 @@ export const getUserScheduledTasks = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Change Password
+
 /**
  * Change password
  * POST /api/users/:id/password
@@ -397,19 +496,29 @@ export const changePassword = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
     const { currentPassword, newPassword } = req.body
-    if (!currentPassword || !newPassword)
+    if (!newPassword)
       return res
         .status(400)
-        .json({ success: false, message: "current and new passwords required" })
+        .json({ success: false, message: "new password required" })
 
     const user = await prisma.user.findUnique({ where: { id } })
     if (!user) return res.status(404).json({ success: false, message: "User not found" })
 
-    const match = await bcrypt.compare(currentPassword, user.password_hash)
-    if (!match)
-      return res
-        .status(401)
-        .json({ success: false, message: "Current password incorrect" })
+    if (user.password_hash == ""){
+      if (currentPassword != "")
+        return res
+          .status(401)
+          .json({ success: false, message: "Current password incorrect" })
+    }
+    else {
+      const match = await bcrypt.compare(currentPassword, user.password_hash)
+      if (!match)
+        return res
+          .status(401)
+          .json({ success: false, message: "Current password incorrect" })
+    }
+
+    
 
     const hashed = await bcrypt.hash(newPassword, 10)
     await prisma.user.update({ where: { id }, data: { password_hash: hashed } })
@@ -421,6 +530,10 @@ export const changePassword = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Login
+
 /**
  * Login user
  * POST /api/users/login
@@ -429,10 +542,10 @@ export const changePassword = async (req: Request, res: Response) => {
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body
-    if (!email || !password)
+    if (!email)
       return res
         .status(400)
-        .json({ success: false, message: "Email and password required" })
+        .json({ success: false, message: "Email is required" })
 
     const user = await prisma.user.findUnique({ where: { email } })
     if (!user)
@@ -440,11 +553,20 @@ export const loginUser = async (req: Request, res: Response) => {
         .status(401)
         .json({ success: false, message: "Invalid email or password" })
 
-    const match = await bcrypt.compare(password, user.password_hash)
-    if (!match)
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid email or password" })
+    if (user.password_hash == "") {
+      if (password != "")
+        return res
+          .status(401)
+          .json({ success: false, message: "Invalid email or password" })
+    }
+    else {
+      const match = await bcrypt.compare(password, user.password_hash)
+      if (!match)
+        return res
+          .status(401)
+          .json({ success: false, message: "Invalid email or password" })
+    }
+    
 
     // strip sensitive field
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -456,3 +578,5 @@ export const loginUser = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to login" })
   }
 }
+
+// #endregion

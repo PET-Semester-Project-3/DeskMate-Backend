@@ -1,6 +1,8 @@
 import { Request, Response } from "express"
 import { prisma } from "../db/prisma"
 
+// #region GetAll
+
 export const getAllPermissions = async (req: Request, res: Response) => {
   try {
     const perms = await prisma.permission.findMany()
@@ -10,6 +12,10 @@ export const getAllPermissions = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch permissions" })
   }
 }
+
+// #endregion
+
+// #region Get
 
 export const getPermissionById = async (req: Request, res: Response) => {
   try {
@@ -24,6 +30,10 @@ export const getPermissionById = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Create
+
 export const createPermission = async (req: Request, res: Response) => {
   try {
     const { label, route } = req.body
@@ -35,6 +45,10 @@ export const createPermission = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to create permission" })
   }
 }
+
+// #endregion
+
+// #region Update
 
 export const updatePermission = async (req: Request, res: Response) => {
   try {
@@ -51,6 +65,10 @@ export const updatePermission = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Delete
+
 export const deletePermission = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
@@ -64,6 +82,10 @@ export const deletePermission = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to delete permission" })
   }
 }
+
+// #endregion
+
+// #region Add To User
 
 /* Assignment helpers */
 export const assignPermissionToUser = async (req: Request, res: Response) => {
@@ -98,6 +120,10 @@ export const assignPermissionToUser = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Remove From User
+
 export const removePermissionFromUser = async (req: Request, res: Response) => {
   try {
     const { id: permissionId } = req.params
@@ -117,3 +143,5 @@ export const removePermissionFromUser = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to remove permission" })
   }
 }
+
+// #endregion

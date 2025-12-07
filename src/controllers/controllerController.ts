@@ -1,6 +1,8 @@
 import { Request, Response } from "express"
 import { prisma } from "../db/prisma"
 
+// #region GetAll
+
 /**
  * GET /api/controllers
  */
@@ -15,6 +17,10 @@ export const getAllControllers = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch controllers" })
   }
 }
+
+// #endregion
+
+// #region Get
 
 /**
  * GET /api/controllers/:id
@@ -35,6 +41,10 @@ export const getControllerById = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Create
+
 /**
  * POST /api/controllers
  * Body: { name: string }
@@ -54,6 +64,10 @@ export const createController = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to create controller" })
   }
 }
+
+// #endregion
+
+// #region Update
 
 /**
  * PUT /api/controllers/:id
@@ -80,6 +94,10 @@ export const updateController = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Delete
+
 /**
  * DELETE /api/controllers/:id
  */
@@ -98,6 +116,10 @@ export const deleteController = async (req: Request, res: Response) => {
   }
 }
 
+// #endregion
+
+// #region Get Controller Desks
+
 /**
  * GET /api/controllers/:id/desks
  */
@@ -111,3 +133,5 @@ export const getControllerDesks = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Failed to fetch desks" })
   }
 }
+
+// #endregion
