@@ -58,26 +58,26 @@ export const getDeskMateById = async (req: Request, res: Response) => {
  */
 export const createDeskMate = async (req: Request, res: Response) => {
   try {
-    const { userId, name } = req.body
-    if (!userId || !name)
+    const { user_id, name } = req.body
+    if (!user_id || !name)
       return res
         .status(400)
-        .json({ success: false, message: "userId and name required" })
+        .json({ success: false, message: "user_id and name required" })
 
-    const user = await prisma.user.findUnique({ where: { id: userId } })
+    const user = await prisma.user.findUnique({ where: { id: user_id } })
     if (!user)
       return res
         .status(404)
         .json({ success: false, message: "User not found" })
 
     const exists = await prisma.deskMate.findFirst({
-      where: { user_id: userId },
+      where: { user_id: user_id },
     })
     if (exists)
       return res.status(409).json({ success: false, message: "DeskMate already exists" })
 
     const deskmate = await prisma.deskMate.create({
-      data: { user_id: userId, name: name },
+      data: { user_id: user_id, name: name },
       include: { user: true },
     })
     res.status(201).json({ success: true, data: deskmate })
@@ -98,18 +98,18 @@ export const createDeskMate = async (req: Request, res: Response) => {
 export const updateDeskMate = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
-    const { userId, name, streak, achievements } = req.body
+    const { user_id, name, streak, achievements } = req.body
 
     const existing = await prisma.deskMate.findUnique({ where: { id } })
     if (!existing)
       return res.status(404).json({ success: false, message: "DeskMate not found" })
 
     const data: any = {}
-    if (userId) {
-      const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (user_id) {
+      const user = await prisma.user.findUnique({ where: { id: user_id } })
       if (!user)
         return res.status(404).json({ success: false, message: "User not found" })
-      data.user_id = userId
+      data.user_id = user_id
     }
     if (name) data.name = name;
     if (streak) data.streak = streak;
