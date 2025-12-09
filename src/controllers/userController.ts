@@ -16,7 +16,23 @@ export const getAllUsers = async (req: Request, res: Response) => {
         email: true,
         created_at: true,
         updated_at: true,
-        main_desk_id: true
+        main_desk_id: true,
+        // join table records (all fields) + nested related models (all fields)
+        userDesks: {
+          include: {
+            desk: {
+              include: {
+                controller: true,
+                // avoid recursive includes back to userDesks/scheduledTasks
+              },
+            },
+          },
+        },
+        userPermissions: {
+          include: {
+            permission: true,
+          },
+        },
       },
     })
     res.json({ success: true, data: users })

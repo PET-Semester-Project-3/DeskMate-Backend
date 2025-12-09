@@ -20,7 +20,7 @@ async function main() {
   const isCreateUserToDeskRelations = true;
   const isCreateUserToPermissionsRelations = true;
 
-  const isDeskMates = true;
+  const isCreateDeskMates = true;
 
 
   console.log('Start seeding...');
@@ -98,9 +98,9 @@ async function main() {
   // Create demo permissions
   if (isCreatePermissions) {
     console.log('Creating demo permissions...');
-    const permission1 = await createPermission('ba643e58-0e52-4a8f-baf4-329de946ec76', 'Dashboard', '/', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const permission2 = await createPermission('140898c7-2e9c-471d-88eb-7b1b277cb880','Desk', '/desk', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const permission3 = await createPermission('ec95035b-99f2-4752-9911-c93387ff6cd9','Maintenance', '/maintenance', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const permission1 = await createPermission('140898c7-2e9c-471d-88eb-7b1b277cb880','Desk', '/desk', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const permission2 = await createPermission('ec95035b-99f2-4752-9911-c93387ff6cd9','Maintenance', '/maintenance', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const permission3 = await createPermission('adc5ef70-6cf3-41a1-85f4-7bf6ae67bf11','Management', '/management', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     const permission4 = await createPermission('70fd3ff3-f37f-413a-b852-04fdf1e27b67','Database', '/database', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     console.log('Created permissions:', { permission1, permission2, permission3, permission4 });
   }
@@ -158,24 +158,23 @@ async function main() {
   // Create demo UserToPermission relations
   if (isCreateUserToPermissionsRelations) {
     console.log('Creating demo UserToPermission relations...');
-    const userToPermissionRelation1 = await createUserToPermission('bb8f33af-267e-4db8-9e58-0985c7f7e463', 'd812baf1-1d50-4c83-ad2e-d65dd1d0dce2', 'ba643e58-0e52-4a8f-baf4-329de946ec76', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const userToPermissionRelation2 = await createUserToPermission('e4926f23-54a8-4a11-b6c1-3dae99826e6b', 'd812baf1-1d50-4c83-ad2e-d65dd1d0dce2', '140898c7-2e9c-471d-88eb-7b1b277cb880', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const userToPermissionRelation3 = await createUserToPermission('efd9b47d-7525-4ddd-961f-f4d0903afcd9', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', 'ba643e58-0e52-4a8f-baf4-329de946ec76', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const userToPermissionRelation4 = await createUserToPermission('30079cc0-2101-481f-97a0-b15b1595f535', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', '140898c7-2e9c-471d-88eb-7b1b277cb880', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const userToPermissionRelation5 = await createUserToPermission('89fd0b2f-694b-4cff-9fdb-e23ca2bbf6c6', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', 'ec95035b-99f2-4752-9911-c93387ff6cd9', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const userToPermissionRelation6 = await createUserToPermission('4e871e92-4315-45be-b298-91d5a6b3f9b6', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', '70fd3ff3-f37f-413a-b852-04fdf1e27b67', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const userToPermissionRelation7 = await createUserToPermission('949a4b67-a29a-42bb-8a9f-f9582f3fdda9', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', 'ba643e58-0e52-4a8f-baf4-329de946ec76', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const userToPermissionRelation8 = await createUserToPermission('b2006760-9254-41d5-b87a-b9459b1c0654', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', '140898c7-2e9c-471d-88eb-7b1b277cb880', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const userToPermissionRelation9 = await createUserToPermission('4416141b-a319-4f99-bad6-857388af34ec', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', 'ec95035b-99f2-4752-9911-c93387ff6cd9', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    console.log('Created UserToPermission relations:', { userToPermissionRelation1, userToPermissionRelation2, userToPermissionRelation3, userToPermissionRelation4, userToPermissionRelation5, userToPermissionRelation6, userToPermissionRelation7, userToPermissionRelation8, userToPermissionRelation9 });
+    const userToPermissionRelation1 = await createUserToPermission('e4926f23-54a8-4a11-b6c1-3dae99826e6b', 'd812baf1-1d50-4c83-ad2e-d65dd1d0dce2', '140898c7-2e9c-471d-88eb-7b1b277cb880', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation2 = await createUserToPermission('30079cc0-2101-481f-97a0-b15b1595f535', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', '140898c7-2e9c-471d-88eb-7b1b277cb880', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation3 = await createUserToPermission('89fd0b2f-694b-4cff-9fdb-e23ca2bbf6c6', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', 'ec95035b-99f2-4752-9911-c93387ff6cd9', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation5 = await createUserToPermission('5d85243e-4d53-4306-9242-d9b7c9d1ce8c', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', 'adc5ef70-6cf3-41a1-85f4-7bf6ae67bf11', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation4 = await createUserToPermission('4e871e92-4315-45be-b298-91d5a6b3f9b6', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', '70fd3ff3-f37f-413a-b852-04fdf1e27b67', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation6 = await createUserToPermission('b2006760-9254-41d5-b87a-b9459b1c0654', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', '140898c7-2e9c-471d-88eb-7b1b277cb880', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation7 = await createUserToPermission('4416141b-a319-4f99-bad6-857388af34ec', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', 'ec95035b-99f2-4752-9911-c93387ff6cd9', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation8 = await createUserToPermission('281ca656-780a-4acf-8681-87ff8d9fbd82', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', 'adc5ef70-6cf3-41a1-85f4-7bf6ae67bf11', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    console.log('Created UserToPermission relations:', { userToPermissionRelation1, userToPermissionRelation2, userToPermissionRelation3, userToPermissionRelation4, userToPermissionRelation5, userToPermissionRelation6, userToPermissionRelation7, userToPermissionRelation8 });
   }
 
   // Create demo Deskmates
-  if (isCreateUserToPermissionsRelations) {
+  if (isCreateDeskMates) {
     console.log('Creating demo UserToPermission relations...');
     const deskmate1 = await createDeskmate('dd47b424-4c1c-4cc4-85e1-8e509c27ba56', 'd812baf1-1d50-4c83-ad2e-d65dd1d0dce2', 'Jhonny', 5 , new Date(Date.now()), new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const deskmate2 = await createDeskmate('c13b5aae-d147-45c0-95c7-f8443ef0c884', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', 'Carl', 12, new Date(Date.now() - (3 * 1000 * 3600 * 24)), new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const deskmate3 = await createDeskmate('e369503d-f725-49dd-88f6-fae9f9221c88', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', 'Ron', 2, new Date(Date.now() - (6 * 1000 * 3600 * 24)), new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const deskmate2 = await createDeskmate('c13b5aae-d147-45c0-95c7-f8443ef0c884', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', 'Carl', 12, new Date(Date.now() - (2 * 1000 * 3600 * 24)), new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const deskmate3 = await createDeskmate('e369503d-f725-49dd-88f6-fae9f9221c88', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', 'Ron', 2, new Date(Date.now() - (3 * 1000 * 3600 * 24)), new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     console.log('Created Deskmates:', { deskmate1, deskmate2, deskmate3 });
   }
 

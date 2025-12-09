@@ -166,9 +166,9 @@ export const updateDeskMateStreak = async (req: Request, res: Response) => {
       return res.status(404).json({ success: false, message: "DeskMate not found" })
 
     const data: any = {}
-    data.streak = ++data.streak;
-    data.last_streak = new Date();
-
+    data.streak = ++existing.streak;
+    data.last_streak = new Date(Date.now());
+    
     const updated = await prisma.deskMate.update({
       where: { id },
       data,
