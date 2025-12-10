@@ -5,6 +5,7 @@ import { prisma } from "../db/prisma"
 
 /**
  * POST /api/pico-heartbeat
+ * Body: { id: string }
  */
 export const picoHearbeat = async (req: Request, res: Response) => {
   try {
@@ -39,9 +40,8 @@ export const picoOccupied = async (req: Request, res: Response) => {
     }
 
     // Find the controller
-    const controller = await prisma.controller.findUnique({
-      where: { id },
-      include: { desks: true },
+    const controller = await prisma.controller.findFirst({
+      where: { name: id },
     })
 
     if (!controller) 
@@ -66,40 +66,6 @@ export const picoOccupied = async (req: Request, res: Response) => {
   }
 }
 
-/*
-export const createDeskMate = async (req: Request, res: Response) => {
-  try {
-    const { userId, name } = req.body
-    if (!userId || !name)
-      return res
-        .status(400)
-        .json({ success: false, message: "userId and name required" })
-
-    const user = await prisma.user.findUnique({ where: { id: userId } })
-    if (!user)
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" })
-
-    const exists = await prisma.deskMate.findFirst({
-      where: { user_id: userId },
-    })
-    if (exists)
-      return res.status(409).json({ success: false, message: "DeskMate already exists" })
-
-    const deskmate = await prisma.deskMate.create({
-      data: { user_id: userId, name: name },
-      include: { user: true },
-    })
-    res.status(201).json({ success: true, data: deskmate })
-  } catch (error) {
-    console.error("Error creating deskmate:", error)
-    res.status(500).json({ success: false, message: "Failed to create deskmate" })
-  }
-}
-*/
-
-
 // #endregion
 
 // #region PicoConnect
@@ -111,13 +77,46 @@ export const createDeskMate = async (req: Request, res: Response) => {
 export const picoConnect = async (req: Request, res: Response) => {
   try {
     const { last_id } = req.body
-    if (!last_id) return res.status(400).json({ success: false, message: "last_id required" })
+    
+    // If last_id is not "-1", check if controller exists
+    if (last_id && last_id !== "-1") 
+    {
+      const existingController = await prisma.controller.findFirst({
+        where: { name: last_id }
+      })
 
 
-    res.status(201).json({ success: true, data: last_id })
+      if (existingController) 
+      {
+        return res.status(200).json({ 
+          success: true, 
+          id: last_id 
+        })
+      }
+    }
+
+
+    const newController = await prisma.$transaction(async (tx) => {
+    const controller = await tx.controller.create({
+      data: {name:"-1"}
+    })
+    
+    // Because I am not sure what name is apperently supposed to be
+    return await tx.controller.update({
+      where: { id: controller.id },
+      data: { name: controller.id }
+    })
+  })
+
+
+    res.status(200).json({ 
+      success: true, 
+      id: newController.id 
+    })
+    
   } catch (error) {
-    console.error("Error creating controller:", error)
-    res.status(500).json({ success: false, message: "Failed to create controller" })
+    console.error("Error in pico-connect:", error)
+    res.status(500).json({ success: false, message: "Failed to process pico connection" })
   }
 }
 
