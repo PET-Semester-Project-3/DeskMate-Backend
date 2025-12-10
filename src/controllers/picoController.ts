@@ -6,16 +6,56 @@ import { prisma } from "../db/prisma"
 /**
  * POST /api/pico-heartbeat
  * Body: { id: string }
+ * Res: {state: integer} 
+ * 
+ * Result meaning:
+ * 1 - Blink, there was an event and you are occupied
+ * 0 - Function normally
+ * 
+ * In order for it to work the schedulled tasks need to be changed to pending
  */
 export const picoHearbeat = async (req: Request, res: Response) => {
   try {
-    const controllers = await prisma.controller.findMany({
-      include: { desks: true },
+    const { id } = req.body
+    
+    if (!id) 
+    {
+      return res.status(400).json({ 
+        success: false, 
+        message: "id is required" 
+      })
+    }
+
+    // Find the controller with its associated desks
+    const controller = await prisma.controller.findUnique({
+      where: { id },
+      include: { desks: { include: { scheduledTasks: { where: { status: 'PENDING'}}}}
+      },
     })
-    res.json({ success: true, data: controllers })
+
+
+    // if it exists, it means that this controller has a desk which has a schedulled event, so we check if it is locked, if so blink
+    if (controller && desk.is_locked)
+    {
+        res.json({ 
+        success: true, 
+        state: 1
+        })
+    }else
+    {
+      res.json({ 
+        success: true, 
+        state: 0
+      })
+    }
+
+
   } catch (error) {
-    console.error("Error fetching controllers:", error)
-    res.status(500).json({ success: false, message: "Failed to fetch controllers" })
+    console.error("Error processing pico heartbeat:", error)
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to process heartbeat" 
+    })
   }
 }
 
