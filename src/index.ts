@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express"
 import dotenv from "dotenv"
 import cors from "cors"
+import net from "net"
 import userRoutes from "./routes/userRoutes"
 import deskRoutes from "./routes/deskRoutes"
 import scheduledTaskRoutes from "./routes/scheduledTaskRoutes"
@@ -9,6 +10,7 @@ import controllerRoutes from "./routes/controllerRoutes"
 import userDeskRoutes from "./routes/userDeskRoutes"
 import userPermissionRoutes from "./routes/userPermissionRoutes"
 import deskMateRoutes from "./routes/deskMateRoutes"
+import { initSchedulerJob } from "./jobs/schedulerJob"
 
 dotenv.config()
 
@@ -48,6 +50,43 @@ app.use("/api/user-desks", userDeskRoutes)
 app.use("/api/user-permissions", userPermissionRoutes)
 app.use("/api/deskmates", deskMateRoutes)
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`)
-})
+// Check if port is already in use before starting
+function checkPortInUse(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const server = net.createServer()
+    server.once("error", (err: NodeJS.ErrnoException) => {
+      if (err.code === "EADDRINUSE") {
+        resolve(true)
+      } else {
+        resolve(false)
+      }
+    })
+    server.once("listening", () => {
+      server.close()
+      resolve(false)
+    })
+    server.listen(port)
+  })
+}
+
+// Start server with port check
+async function startServer() {
+  const portNumber = Number(PORT)
+  const portInUse = await checkPortInUse(portNumber)
+
+  if (portInUse) {
+    console.error(`\x1b[31mError: Port ${PORT} is already in use!\x1b[0m`)
+    console.error(`Another application is running on this port.`)
+    console.error(`Please stop the other application or use a different port.`)
+    process.exit(1)
+  }
+
+  // Initialize scheduler job
+  initSchedulerJob()
+
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`)
+  })
+}
+
+startServer()
