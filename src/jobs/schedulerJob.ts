@@ -1,5 +1,7 @@
 import cron from "node-cron"
 import { prisma } from "../db/prisma"
+import * as simulatorService from "../services/simulatorService"
+import { SimulatorTimeoutError, SimulatorConnectionError } from "../errors/DeskErrors"
 
 export function initSchedulerJob() {
   console.log("Initializing scheduler job...")
@@ -18,13 +20,27 @@ export function initSchedulerJob() {
         include: { desk: true, user: true },
       })
 
-      if (dueTasks.length === 0) return
+      console.log(`[Scheduler] Polling... found ${dueTasks.length} due task(s)`)
 
-      console.log(`[Scheduler] Found ${dueTasks.length} due task(s)`)
+      if (dueTasks.length === 0) return
 
       // Process each task
       for (const task of dueTasks) {
         try {
+          // Check if desk is occupied (locked)
+          if (task.desk.is_locked) {
+            await prisma.scheduledTask.update({
+              where: { id: task.id },
+              data: {
+                status: "FAILED",
+                error_message: "Desk is occupied",
+                completed_at: new Date(),
+              },
+            })
+            console.log(`[Scheduler] Task ${task.id} failed: Desk is occupied`)
+            continue
+          }
+
           // Mark as in progress
           await prisma.scheduledTask.update({
             where: { id: task.id },
@@ -35,14 +51,30 @@ export function initSchedulerJob() {
             `[Scheduler] Executing task ${task.id}: Set desk "${task.desk.name}" to ${task.new_height}cm`
           )
 
+          // Convert cm to mm and call simulator
+          const position_mm = task.new_height * 10
+          let simulatorOffline = false
+
+          try {
+            await simulatorService.setDeskPosition(task.desk.id, position_mm)
+          } catch (simError) {
+            if (simError instanceof SimulatorTimeoutError || simError instanceof SimulatorConnectionError) {
+              console.warn(`[Scheduler] Simulator unavailable, updating database only`)
+              simulatorOffline = true
+            } else {
+              throw simError
+            }
+          }
+
           // Update desk height in last_data
           const currentData =
             (task.desk.last_data as Record<string, unknown>) || {}
           const updatedData = {
             ...currentData,
+            position_mm: position_mm,
             height: task.new_height,
             last_adjusted_at: new Date().toISOString(),
-            adjusted_by: "scheduler",
+            adjusted_by: simulatorOffline ? "scheduler (simulator offline)" : "scheduler",
           }
 
           await prisma.desk.update({

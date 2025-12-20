@@ -10,7 +10,9 @@ import controllerRoutes from "./routes/controllerRoutes"
 import userDeskRoutes from "./routes/userDeskRoutes"
 import userPermissionRoutes from "./routes/userPermissionRoutes"
 import deskMateRoutes from "./routes/deskMateRoutes"
+import picoRoutes from "./routes/picoRoutes"
 import { initSchedulerJob } from "./jobs/schedulerJob"
+import { syncAllDesks } from "./services/deskSyncService"
 
 dotenv.config()
 
@@ -49,6 +51,7 @@ app.use("/api/controllers", controllerRoutes)
 app.use("/api/user-desks", userDeskRoutes)
 app.use("/api/user-permissions", userPermissionRoutes)
 app.use("/api/deskmates", deskMateRoutes)
+app.use("/api", picoRoutes)
 
 // Check if port is already in use before starting
 function checkPortInUse(port: number): Promise<boolean> {
@@ -84,8 +87,17 @@ async function startServer() {
   // Initialize scheduler job
   initSchedulerJob()
 
-  app.listen(PORT, () => {
+  app.listen(PORT, async () => {
     console.log(`Server is running on http://localhost:${PORT}`)
+
+    // Auto-sync desks from simulator on startup
+    try {
+      console.log(`[Startup] Connecting to simulator at ${process.env.SIMULATOR_URL || "http://localhost:8000"}...`)
+      const synced = await syncAllDesks()
+      console.log(`[Startup] Successfully synced ${synced} desks from simulator`)
+    } catch {
+      console.warn(`[Startup] Could not sync desks - simulator not available at ${process.env.SIMULATOR_URL || "http://localhost:8000"}`)
+    }
   })
 }
 

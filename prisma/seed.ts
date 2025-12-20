@@ -16,8 +16,8 @@ async function main() {
   const isCreateControllers = true;
   const isCreateDesks = true;
   const isCreatePermissions = true;
-  const isCreateScheduledTask = true;
-  const isCreateUserToDeskRelations = true;
+  const isCreateScheduledTask = false; // Disabled - old desk IDs don't exist
+  const isCreateUserToDeskRelations = false; // Disabled - handled in isCreateDesks
   const isCreateUserToPermissionsRelations = true;
 
   const isDeskMates = true;
@@ -69,30 +69,49 @@ async function main() {
     console.log('Created users:', { user1, user2, user3 });
   }
   
-  // Create demo desks
+  // Create simulator desks (hardcoded defaults, will be updated when simulator syncs)
   if (isCreateDesks) {
-    console.log('Creating demo desks...');
-    const desk1 = await createDesk('1', '8bdd51ed-2e55-4b96-9982-2d5265403d3c', 'DCD1', false, true,
-      JSON.parse("{\"manufacturer\":\"Linak\", \"height\":75,\"errors\":[\"Pressure Sensor\",\"Connection Issue\"],\"activationCounter\":42,\"sitStandCounter\":11}"),
-      new Date('2025-11-14T18:11'), new Date('2025-11-14T18:00'), new Date('2025-11-14T18:11')
-    )
-    const desk2 = await createDesk('2', '1639f8fa-44c0-434f-be0b-b4f752be634d', 'DCD2', false, true,
-      JSON.parse("{\"manufacturer\":\"Linak\", \"height\":75,\"activationCounter\":16,\"sitStandCounter\":5}"),
-      new Date('2025-11-11T13:10'), new Date('2025-11-14T13:00'), new Date('2025-11-14T13:10')
-    )
-    const desk3 = await createDesk('3', null, 'DCD3', true, false,
-      JSON.parse("{\"manufacturer\":\"Linak\", \"height\":75,\"activationCounter\":12,\"sitStandCounter\":2}"),
-      new Date('2025-11-04T13:10'), new Date('2025-11-04T13:00'), new Date('2025-11-04T04:10')
-    )
-    const desk4 = await createDesk('4', null, 'DCD4', false, false,
-      JSON.parse("{\"manufacturer\":\"Linak\", \"height\":75,\"errors\":[\"Pressure Sensor\"],\"activationCounter\":24,\"sitStandCounter\":6}"),
-      new Date('2025-10-04T13:10'), new Date('2025-10-04T13:00'), new Date('2025-10-04T04:10')
-    )
-    const desk5 = await createDesk('5', null, 'DCD5', false, true,
-      JSON.parse("{\"manufacturer\":\"Linak\", \"height\":75,\"activationCounter\":64,\"sitStandCounter\":1}"),
-      new Date('2025-10-07T13:10'), new Date('2025-10-07T13:00'), new Date('2025-10-07T04:10')
-    )
-    console.log('Created desks:', { desk1, desk2, desk3, desk4, desk5 });
+    console.log('Creating simulator desks...');
+    const adminUserId = 'd93419b8-7f82-4a1f-943d-6ad9bde6d993'; // admin@deskmate.com
+
+    // Default simulator desks (from wifi2ble-box-simulator/data/desks_state.json)
+    const simulatorDesks = [
+      { id: 'cd:fb:1a:53:fb:e6', name: 'DESK 4486', manufacturer: 'Desk-O-Matic Co.', position_mm: 872, activationsCounter: 61, sitStandCounter: 15 },
+      { id: 'ee:62:5b:b8:73:1d', name: 'DESK 6743', manufacturer: 'Desk-O-Matic Co.', position_mm: 1320, activationsCounter: 45, sitStandCounter: 12 },
+      { id: '70:9e:d5:e7:8c:98', name: 'DESK 3677', manufacturer: 'Desk-O-Matic Co.', position_mm: 900, activationsCounter: 38, sitStandCounter: 9 },
+      { id: '00:ec:eb:50:c2:c8', name: 'DESK 3050', manufacturer: 'Desk-O-Matic Co.', position_mm: 680, activationsCounter: 22, sitStandCounter: 5 },
+      { id: 'f1:50:c2:b8:bf:22', name: 'DESK 8294', manufacturer: 'Desk-O-Matic Co.', position_mm: 950, activationsCounter: 55, sitStandCounter: 14 },
+      { id: 'ce:38:a6:30:af:1d', name: 'DESK 7380', manufacturer: 'Desk-O-Matic Co.', position_mm: 800, activationsCounter: 33, sitStandCounter: 8 },
+      { id: '91:17:a4:3b:f4:4d', name: 'DESK 6782', manufacturer: 'Desk-O-Matic Co.', position_mm: 1100, activationsCounter: 41, sitStandCounter: 10 },
+    ];
+
+    for (const desk of simulatorDesks) {
+      await prisma.desk.create({
+        data: {
+          id: desk.id,
+          name: desk.name,
+          is_online: false,
+          is_locked: false,
+          last_data: {
+            manufacturer: desk.manufacturer,
+            position_mm: desk.position_mm,
+            height: Math.round(desk.position_mm / 10), // Convert mm to cm
+            activationsCounter: desk.activationsCounter,
+            sitStandCounter: desk.sitStandCounter,
+            speed_mms: 0,
+            status: 'Normal',
+          },
+          last_data_at: new Date(),
+        },
+      });
+
+      // Assign to admin user
+      await prisma.userDesk.create({
+        data: { user_id: adminUserId, desk_id: desk.id },
+      });
+
+      console.log(`Created desk: ${desk.id} (${desk.name})`);
+    }
   }
 
   // Create demo permissions

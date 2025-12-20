@@ -34,19 +34,15 @@ export const picoHearbeat = async (req: Request, res: Response) => {
     })
 
 
-    // if it exists, it means that this controller has a desk which has a schedulled event, so we check if it is locked, if so blink
-    if (controller && desk.is_locked)
-    {
-        res.json({ 
-        success: true, 
-        state: 1
-        })
-    }else
-    {
-      res.json({ 
-        success: true, 
-        state: 0
-      })
+    // Check if any desk has pending scheduled tasks AND is locked (occupied)
+    const shouldBlink = controller?.desks?.some(
+      desk => desk.scheduledTasks.length > 0 && desk.is_locked
+    ) ?? false
+
+    if (shouldBlink) {
+      res.json({ state: 1 })
+    } else {
+      res.json({ state: 0 })
     }
 
 
