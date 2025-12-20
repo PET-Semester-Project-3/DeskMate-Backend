@@ -20,7 +20,7 @@ export function initSchedulerJob() {
         include: { desk: true, user: true },
       })
 
-      console.log(`[Scheduler] Polling... found ${dueTasks.length} due task(s)`)
+      console.log(`[Scheduler] [${now.toISOString()}] Polling... found ${dueTasks.length} due task(s)`)
 
       if (dueTasks.length === 0) return
 

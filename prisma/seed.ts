@@ -121,7 +121,8 @@ async function main() {
     const permission2 = await createPermission('140898c7-2e9c-471d-88eb-7b1b277cb880','Desk', '/desk', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     const permission3 = await createPermission('ec95035b-99f2-4752-9911-c93387ff6cd9','Maintenance', '/maintenance', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     const permission4 = await createPermission('70fd3ff3-f37f-413a-b852-04fdf1e27b67','Database', '/database', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    console.log('Created permissions:', { permission1, permission2, permission3, permission4 });
+    const permission5 = await createPermission('a1b2c3d4-e5f6-7890-abcd-ef1234567890','Schedule', '/schedule', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    console.log('Created permissions:', { permission1, permission2, permission3, permission4, permission5 });
   }
 
   // Create demo scheduled tasks
@@ -186,7 +187,11 @@ async function main() {
     const userToPermissionRelation7 = await createUserToPermission('949a4b67-a29a-42bb-8a9f-f9582f3fdda9', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', 'ba643e58-0e52-4a8f-baf4-329de946ec76', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     const userToPermissionRelation8 = await createUserToPermission('b2006760-9254-41d5-b87a-b9459b1c0654', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', '140898c7-2e9c-471d-88eb-7b1b277cb880', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     const userToPermissionRelation9 = await createUserToPermission('4416141b-a319-4f99-bad6-857388af34ec', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', 'ec95035b-99f2-4752-9911-c93387ff6cd9', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    console.log('Created UserToPermission relations:', { userToPermissionRelation1, userToPermissionRelation2, userToPermissionRelation3, userToPermissionRelation4, userToPermissionRelation5, userToPermissionRelation6, userToPermissionRelation7, userToPermissionRelation8, userToPermissionRelation9 });
+    // Schedule permission for all users
+    const userToPermissionRelation10 = await createUserToPermission('5a6b7c8d-9e0f-1234-5678-9abcdef01234', 'd812baf1-1d50-4c83-ad2e-d65dd1d0dce2', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation11 = await createUserToPermission('6b7c8d9e-0f12-3456-789a-bcdef0123456', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const userToPermissionRelation12 = await createUserToPermission('7c8d9e0f-1234-5678-9abc-def012345678', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    console.log('Created UserToPermission relations:', { userToPermissionRelation1, userToPermissionRelation2, userToPermissionRelation3, userToPermissionRelation4, userToPermissionRelation5, userToPermissionRelation6, userToPermissionRelation7, userToPermissionRelation8, userToPermissionRelation9, userToPermissionRelation10, userToPermissionRelation11, userToPermissionRelation12 });
   }
 
   // Create demo Deskmates
