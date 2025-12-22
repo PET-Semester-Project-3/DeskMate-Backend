@@ -20,7 +20,7 @@ async function main() {
   const isCreateUserToDeskRelations = false; // Disabled - handled in isCreateDesks
   const isCreateUserToPermissionsRelations = true;
 
-  const isDeskMates = true;
+  const isCreateDeskMates = true;
 
 
   console.log('Start seeding...');
@@ -117,9 +117,9 @@ async function main() {
   // Create demo permissions
   if (isCreatePermissions) {
     console.log('Creating demo permissions...');
-    const permission1 = await createPermission('ba643e58-0e52-4a8f-baf4-329de946ec76', 'Dashboard', '/', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const permission2 = await createPermission('140898c7-2e9c-471d-88eb-7b1b277cb880','Desk', '/desk', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const permission3 = await createPermission('ec95035b-99f2-4752-9911-c93387ff6cd9','Maintenance', '/maintenance', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const permission1 = await createPermission('140898c7-2e9c-471d-88eb-7b1b277cb880','Desk', '/desk', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const permission2 = await createPermission('ec95035b-99f2-4752-9911-c93387ff6cd9','Maintenance', '/maintenance', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const permission3 = await createPermission('adc5ef70-6cf3-41a1-85f4-7bf6ae67bf11','Management', '/management', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     const permission4 = await createPermission('70fd3ff3-f37f-413a-b852-04fdf1e27b67','Database', '/database', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     const permission5 = await createPermission('a1b2c3d4-e5f6-7890-abcd-ef1234567890','Schedule', '/schedule', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     console.log('Created permissions:', { permission1, permission2, permission3, permission4, permission5 });
@@ -160,19 +160,18 @@ async function main() {
   // Create demo UserToDesk relations
   if (isCreateUserToDeskRelations) {
     console.log('Creating demo UserToDesk relations...');
-    const userToDeskRelation1 = await createUserToDesk('29e44bf3-d004-4cd8-8280-97fcb5729405', 'd812baf1-1d50-4c83-ad2e-d65dd1d0dce2', '1', new Date('2025-11-14T18:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation2 = await createUserToDesk('6f676b4a-58af-4880-94ed-854cfa503932', 'd812baf1-1d50-4c83-ad2e-d65dd1d0dce2', '2', new Date('2025-11-14T13:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation3 = await createUserToDesk('1bedcc7d-c491-4fc5-9881-b77c9af52186', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', '1', new Date('2025-11-14T18:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation4 = await createUserToDesk('8ceac26e-b555-458c-b674-d55748035a73', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', '2', new Date('2025-11-14T13:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation5 = await createUserToDesk('7171259a-f910-4f9c-a10e-63c451832fc0', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', '3', new Date('2025-11-04T13:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation6 = await createUserToDesk('8f5ef122-5aed-462b-929d-ce0981fc182b', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', '4', new Date('2025-10-04T13:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation7 = await createUserToDesk('673ef5a0-83ea-43a9-bf80-933568f2e37a', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', '5', new Date('2025-10-07T13:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation8 = await createUserToDesk('bc68ffcb-eb8e-4d54-9bcb-428c98c71577', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', '1', new Date('2025-11-14T18:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation9 = await createUserToDesk('210d4b43-9424-4079-b2e5-631c5e6661cd', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', '2', new Date('2025-11-14T13:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation10 = await createUserToDesk('f58685ca-5e16-4a67-b026-57202599b03c', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', '3', new Date('2025-11-04T13:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation11 = await createUserToDesk('a113900c-6503-4612-9510-6c77c55a6110', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', '4', new Date('2025-10-04T13:00'), new Date('2025-01-01T09:00'));
-    const userToDeskRelation12 = await createUserToDesk('942b8faa-50ce-4402-8afa-33b8ffb247f0', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', '5', new Date('2025-10-07T13:00'), new Date('2025-01-01T09:00'));
-    console.log('Created UserToDesk relations:', { userToDeskRelation1, userToDeskRelation2, userToDeskRelation3, userToDeskRelation4, userToDeskRelation5, userToDeskRelation6, userToDeskRelation7, userToDeskRelation8, userToDeskRelation9, userToDeskRelation10, userToDeskRelation11, userToDeskRelation12 });
+    const userToDeskRelation1 = await createUserToDesk('6f676b4a-58af-4880-94ed-854cfa503932', 'd812baf1-1d50-4c83-ad2e-d65dd1d0dce2', '2', new Date('2025-11-14T13:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation2 = await createUserToDesk('1bedcc7d-c491-4fc5-9881-b77c9af52186', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', '1', new Date('2025-11-14T18:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation3 = await createUserToDesk('8ceac26e-b555-458c-b674-d55748035a73', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', '2', new Date('2025-11-14T13:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation4 = await createUserToDesk('7171259a-f910-4f9c-a10e-63c451832fc0', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', '3', new Date('2025-11-04T13:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation5 = await createUserToDesk('8f5ef122-5aed-462b-929d-ce0981fc182b', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', '4', new Date('2025-10-04T13:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation6 = await createUserToDesk('673ef5a0-83ea-43a9-bf80-933568f2e37a', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', '5', new Date('2025-10-07T13:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation7 = await createUserToDesk('bc68ffcb-eb8e-4d54-9bcb-428c98c71577', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', '1', new Date('2025-11-14T18:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation8 = await createUserToDesk('210d4b43-9424-4079-b2e5-631c5e6661cd', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', '2', new Date('2025-11-14T13:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation9 = await createUserToDesk('f58685ca-5e16-4a67-b026-57202599b03c', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', '3', new Date('2025-11-04T13:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation10 = await createUserToDesk('a113900c-6503-4612-9510-6c77c55a6110', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', '4', new Date('2025-10-04T13:00'), new Date('2025-01-01T09:00'));
+    const userToDeskRelation11 = await createUserToDesk('942b8faa-50ce-4402-8afa-33b8ffb247f0', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', '5', new Date('2025-10-07T13:00'), new Date('2025-01-01T09:00'));
+    console.log('Created UserToDesk relations:', { userToDeskRelation1, userToDeskRelation2, userToDeskRelation3, userToDeskRelation4, userToDeskRelation5, userToDeskRelation6, userToDeskRelation7, userToDeskRelation8, userToDeskRelation9, userToDeskRelation10, userToDeskRelation11 });
   }
 
   // Create demo UserToPermission relations
@@ -192,14 +191,15 @@ async function main() {
     const userToPermissionRelation11 = await createUserToPermission('6b7c8d9e-0f12-3456-789a-bcdef0123456', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     const userToPermissionRelation12 = await createUserToPermission('7c8d9e0f-1234-5678-9abc-def012345678', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     console.log('Created UserToPermission relations:', { userToPermissionRelation1, userToPermissionRelation2, userToPermissionRelation3, userToPermissionRelation4, userToPermissionRelation5, userToPermissionRelation6, userToPermissionRelation7, userToPermissionRelation8, userToPermissionRelation9, userToPermissionRelation10, userToPermissionRelation11, userToPermissionRelation12 });
+
   }
 
   // Create demo Deskmates
-  if (isCreateUserToPermissionsRelations) {
+  if (isCreateDeskMates) {
     console.log('Creating demo UserToPermission relations...');
     const deskmate1 = await createDeskmate('dd47b424-4c1c-4cc4-85e1-8e509c27ba56', 'd812baf1-1d50-4c83-ad2e-d65dd1d0dce2', 'Jhonny', 5 , new Date(Date.now()), new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const deskmate2 = await createDeskmate('c13b5aae-d147-45c0-95c7-f8443ef0c884', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', 'Carl', 12, new Date(Date.now() - (3 * 1000 * 3600 * 24)), new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
-    const deskmate3 = await createDeskmate('e369503d-f725-49dd-88f6-fae9f9221c88', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', 'Ron', 2, new Date(Date.now() - (6 * 1000 * 3600 * 24)), new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const deskmate2 = await createDeskmate('c13b5aae-d147-45c0-95c7-f8443ef0c884', 'd93419b8-7f82-4a1f-943d-6ad9bde6d993', 'Carl', 12, new Date(Date.now() - (2 * 1000 * 3600 * 24)), new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
+    const deskmate3 = await createDeskmate('e369503d-f725-49dd-88f6-fae9f9221c88', 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5', 'Ron', 2, new Date(Date.now() - (3 * 1000 * 3600 * 24)), new Date('2025-01-01T09:00'), new Date('2025-01-01T09:00'));
     console.log('Created Deskmates:', { deskmate1, deskmate2, deskmate3 });
   }
 

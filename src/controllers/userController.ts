@@ -16,7 +16,23 @@ export const getAllUsers = async (req: Request, res: Response) => {
         email: true,
         created_at: true,
         updated_at: true,
-        main_desk_id: true
+        main_desk_id: true,
+        // join table records (all fields) + nested related models (all fields)
+        userDesks: {
+          include: {
+            desk: {
+              include: {
+                controller: true,
+                // avoid recursive includes back to userDesks/scheduledTasks
+              },
+            },
+          },
+        },
+        userPermissions: {
+          include: {
+            permission: true,
+          },
+        },
       },
     })
     res.json({ success: true, data: users })
@@ -130,7 +146,7 @@ export const createUser = async (req: Request, res: Response) => {
  */
 export const createUserWithPermissions = async (req: Request, res: Response) => {
   try {
-    const { email, permissionIds } = req.body
+    const { email, password, permissionIds } = req.body
     if (!email) return res.status(400).json({ success: false, message: "Email required" })
 
     const existingUser = await prisma.user.findUnique({ where: { email } })
@@ -150,11 +166,11 @@ export const createUserWithPermissions = async (req: Request, res: Response) => 
           .json({ success: false, message: "One or more permissions not found" })
     }
 
-    // create user with empty password (users can set/change it later)
-    // password_hash is non-nullable in schema, so store empty string
+    const hashedPassword = await bcrypt.hash(password, 10)
+
     const created = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
-        data: { email, password_hash: "" },
+        data: { email, password_hash: hashedPassword },
         select: { id: true, email: true, created_at: true, updated_at: true },
       })
 
