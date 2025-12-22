@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express"
 import dotenv from "dotenv"
 import cors from "cors"
+import net from "net"
 import userRoutes from "./routes/userRoutes"
 import deskRoutes from "./routes/deskRoutes"
 import scheduledTaskRoutes from "./routes/scheduledTaskRoutes"
@@ -9,6 +10,9 @@ import controllerRoutes from "./routes/controllerRoutes"
 import userDeskRoutes from "./routes/userDeskRoutes"
 import userPermissionRoutes from "./routes/userPermissionRoutes"
 import deskMateRoutes from "./routes/deskMateRoutes"
+import picoRoutes from "./routes/picoRoutes"
+import { initSchedulerJob } from "./jobs/schedulerJob"
+import { syncAllDesks } from "./services/deskSyncService"
 
 dotenv.config()
 
@@ -47,7 +51,54 @@ app.use("/api/controllers", controllerRoutes)
 app.use("/api/user-desks", userDeskRoutes)
 app.use("/api/user-permissions", userPermissionRoutes)
 app.use("/api/deskmates", deskMateRoutes)
+app.use("/api", picoRoutes)
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`)
-})
+// Check if port is already in use before starting
+function checkPortInUse(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const server = net.createServer()
+    server.once("error", (err: NodeJS.ErrnoException) => {
+      if (err.code === "EADDRINUSE") {
+        resolve(true)
+      } else {
+        resolve(false)
+      }
+    })
+    server.once("listening", () => {
+      server.close()
+      resolve(false)
+    })
+    server.listen(port)
+  })
+}
+
+// Start server with port check
+async function startServer() {
+  const portNumber = Number(PORT)
+  const portInUse = await checkPortInUse(portNumber)
+
+  if (portInUse) {
+    console.error(`\x1b[31mError: Port ${PORT} is already in use!\x1b[0m`)
+    console.error(`Another application is running on this port.`)
+    console.error(`Please stop the other application or use a different port.`)
+    process.exit(1)
+  }
+
+  // Initialize scheduler job
+  initSchedulerJob()
+
+  app.listen(PORT, async () => {
+    console.log(`Server is running on http://localhost:${PORT}`)
+
+    // Auto-sync desks from simulator on startup
+    try {
+      console.log(`[Startup] Connecting to simulator at ${process.env.SIMULATOR_URL || "http://localhost:8000"}...`)
+      const synced = await syncAllDesks()
+      console.log(`[Startup] Successfully synced ${synced} desks from simulator`)
+    } catch {
+      console.warn(`[Startup] Could not sync desks - simulator not available at ${process.env.SIMULATOR_URL || "http://localhost:8000"}`)
+    }
+  })
+}
+
+startServer()

@@ -1,5 +1,14 @@
 import { Request, Response } from "express"
 import { prisma } from "../db/prisma"
+import * as simulatorService from "../services/simulatorService"
+import { syncAllDesks } from "../services/deskSyncService"
+import { DESK_HEIGHT_LIMITS } from "../config/simulator"
+import {
+  SimulatorError,
+  SimulatorTimeoutError,
+  SimulatorConnectionError,
+  HeightOutOfRangeError,
+} from "../errors/DeskErrors"
 
 // #region GetAll
 
@@ -99,6 +108,8 @@ export const createDesk = async (req: Request, res: Response) => {
  * Update desk
  * PUT /api/desks/:id
  * Body: { controllerId?: string, name?: string, manufacturer?: string, is_locked?: boolean, last_data?: any }
+ *
+ * If last_data contains position_mm, it will call the simulator to update the desk position.
  */
 export const updateDesk = async (req: Request, res: Response) => {
   try {
@@ -108,6 +119,19 @@ export const updateDesk = async (req: Request, res: Response) => {
     const existing = await prisma.desk.findUnique({ where: { id } })
     if (!existing)
       return res.status(404).json({ success: false, message: "Desk not found" })
+
+    // If last_data contains position_mm, call simulator first
+    if (last_data && typeof last_data === "object" && "position_mm" in last_data) {
+      try {
+        await simulatorService.setDeskPosition(id, last_data.position_mm)
+      } catch (simError) {
+        console.error("Failed to update simulator position:", simError)
+        return res.status(500).json({
+          success: false,
+          message: "Failed to update desk position in simulator"
+        })
+      }
+    }
 
     const data: any = {}
     if (controllerId) {
@@ -120,7 +144,10 @@ export const updateDesk = async (req: Request, res: Response) => {
     }
     if (name !== undefined) data.name = name
     if (is_locked !== undefined) data.is_locked = is_locked
-    if (last_data !== undefined) data.last_data = last_data
+    if (last_data !== undefined) {
+      data.last_data = last_data
+      data.last_data_at = new Date()
+    }
     if (is_online !== undefined) data.is_online = is_online
 
     const desk = await prisma.desk.update({
@@ -290,6 +317,183 @@ export const unlockDesk = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error unlocking desk:", error)
     res.status(500).json({ success: false, message: "Failed to unlock desk" })
+  }
+}
+
+// #endregion
+
+// #region Sync
+
+/**
+ * Sync desks from simulator
+ * POST /api/desks/sync
+ */
+export const syncDesks = async (req: Request, res: Response) => {
+  try {
+    const synced = await syncAllDesks()
+    res.json({ success: true, synced })
+  } catch (error) {
+    console.error("Error syncing desks:", error)
+    res.status(500).json({ success: false, message: "Failed to sync desks from simulator" })
+  }
+}
+
+// #endregion
+
+// #region Set Height
+
+/**
+ * Set desk height via simulator
+ * PUT /api/desks/:id/height
+ * Body: { height: number } (in cm)
+ *
+ * Response codes:
+ * - 200: Success
+ * - 400: Invalid height value or out of range
+ * - 404: Desk not found
+ * - 503: Simulator unavailable (timeout or connection error)
+ * - 500: Database or unknown error
+ */
+export const setDeskHeight = async (req: Request, res: Response) => {
+  const { id } = req.params
+  const { height } = req.body
+
+  // Input validation
+  if (height === undefined || typeof height !== "number") {
+    return res.status(400).json({
+      success: false,
+      code: "INVALID_HEIGHT",
+      message: "height (number in cm) is required",
+    })
+  }
+
+  // Range validation
+  if (height < DESK_HEIGHT_LIMITS.MIN_CM || height > DESK_HEIGHT_LIMITS.MAX_CM) {
+    return res.status(400).json({
+      success: false,
+      code: "HEIGHT_OUT_OF_RANGE",
+      message: `Height must be between ${DESK_HEIGHT_LIMITS.MIN_CM}cm and ${DESK_HEIGHT_LIMITS.MAX_CM}cm`,
+      details: {
+        min: DESK_HEIGHT_LIMITS.MIN_CM,
+        max: DESK_HEIGHT_LIMITS.MAX_CM,
+        attempted: height,
+      },
+    })
+  }
+
+  try {
+    const existing = await prisma.desk.findUnique({ where: { id } })
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        code: "DESK_NOT_FOUND",
+        message: "Desk not found",
+      })
+    }
+
+    // Convert cm to mm and call simulator
+    const position_mm = height * 10
+
+    let result: { position_mm: number }
+    try {
+      result = await simulatorService.setDeskPosition(id, position_mm)
+    } catch (simError) {
+      // Handle simulator-specific errors
+      if (simError instanceof SimulatorTimeoutError || simError instanceof SimulatorConnectionError) {
+        console.warn(`Simulator unavailable for desk ${id}, updating database only:`, simError)
+
+        // Update DB with requested height even though simulator is unavailable
+        const updatedLastData = {
+          ...(existing.last_data as Record<string, unknown> || {}),
+          position_mm: position_mm,
+          height: height,
+        }
+
+        await prisma.desk.update({
+          where: { id },
+          data: {
+            last_data: updatedLastData,
+            last_data_at: new Date(),
+          },
+        })
+
+        return res.json({
+          success: true,
+          code: "HEIGHT_SET_SIMULATOR_OFFLINE",
+          position_mm: position_mm,
+          height: height,
+          warning: "Desk height updated in database. Physical desk may not have moved (simulator offline).",
+        })
+      }
+
+      if (simError instanceof HeightOutOfRangeError) {
+        return res.status(400).json({
+          success: false,
+          code: "HEIGHT_OUT_OF_RANGE",
+          message: simError.message,
+          details: {
+            min: simError.minHeight / 10,
+            max: simError.maxHeight / 10,
+            attempted: simError.attemptedHeight / 10,
+          },
+        })
+      }
+
+      if (simError instanceof SimulatorError) {
+        console.error(`Simulator error for desk ${id}:`, simError)
+        return res.status(503).json({
+          success: false,
+          code: simError.code,
+          message: "Failed to adjust desk height. Please try again.",
+          retryable: true,
+        })
+      }
+
+      // Unknown simulator error
+      throw simError
+    }
+
+    // Update DB with new position
+    try {
+      const updatedLastData = {
+        ...(existing.last_data as Record<string, unknown> || {}),
+        position_mm: result.position_mm,
+        height: result.position_mm / 10,
+      }
+
+      const desk = await prisma.desk.update({
+        where: { id },
+        data: {
+          last_data: updatedLastData,
+          last_data_at: new Date(),
+        },
+      })
+
+      res.json({
+        success: true,
+        code: "HEIGHT_SET",
+        position_mm: result.position_mm,
+        height: result.position_mm / 10,
+        data: desk,
+      })
+    } catch (dbError) {
+      // Simulator succeeded but DB failed - still return success since desk moved
+      console.error(`Database update failed for desk ${id} after successful simulator call:`, dbError)
+      res.json({
+        success: true,
+        code: "HEIGHT_SET_DB_SYNC_WARNING",
+        position_mm: result.position_mm,
+        height: result.position_mm / 10,
+        warning: "Desk height was set but database sync may be delayed",
+      })
+    }
+  } catch (error) {
+    console.error("Error setting desk height:", error)
+    res.status(500).json({
+      success: false,
+      code: "INTERNAL_ERROR",
+      message: "An unexpected error occurred while setting desk height",
+    })
   }
 }
 

@@ -11,6 +11,8 @@ import {
   getDeskScheduledTasks,
   lockDesk,
   unlockDesk,
+  syncDesks,
+  setDeskHeight,
 } from "../controllers/deskController"
 
 const router = Router()
@@ -41,5 +43,11 @@ router.get("/:id/scheduled-tasks", getDeskScheduledTasks)
 // Lock / Unlock
 router.post("/:id/lock", lockDesk)
 router.post("/:id/unlock", unlockDesk)
+
+// Height control (calls simulator)
+router.put("/:id/height", setDeskHeight)
+
+// Sync from simulator
+router.post("/sync", syncDesks)
 
 export default router
