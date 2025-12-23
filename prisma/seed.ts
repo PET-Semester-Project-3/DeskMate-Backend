@@ -16,7 +16,7 @@ async function main() {
   const isCreateControllers = true;
   const isCreateDesks = true;
   const isCreatePermissions = true;
-  const isCreateScheduledTask = false; // Disabled - old desk IDs don't exist
+  const isCreateScheduledTask = true;
   const isCreateUserToDeskRelations = false; // Disabled - handled in isCreateDesks
   const isCreateUserToPermissionsRelations = true;
 
@@ -128,33 +128,112 @@ async function main() {
   // Create demo scheduled tasks
   if (isCreateScheduledTask) {
     console.log('Creating demo scheduled tasks...');
+
+    // Use current time as base for all timestamps
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+    const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000);
+    const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
+    const twoHoursFromNow = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+
+    // Valid desk IDs from simulator
+    const deskIds = {
+      desk1: 'cd:fb:1a:53:fb:e6', // DESK 4486
+      desk2: 'ee:62:5b:b8:73:1d', // DESK 6743
+      desk3: '70:9e:d5:e7:8c:98', // DESK 3677
+      desk4: '00:ec:eb:50:c2:c8', // DESK 3050
+      desk5: 'f1:50:c2:b8:bf:22', // DESK 8294
+    };
+
+    // User IDs
+    const userIds = {
+      admin: 'd93419b8-7f82-4a1f-943d-6ad9bde6d993',
+      user: 'd812baf1-1d50-4c83-ad2e-d65dd1d0dce2',
+      manager: 'bd3e28a8-1582-42b0-892d-b70dfec0b4a5',
+    };
+
+    // PENDING - scheduled for the future
     const scheduledTask1 = await createScheduledTask(
-      'd8c476ad-f436-4f15-81fc-6297879ac17b', 
-      '1',
-      'd812baf1-1d50-4c83-ad2e-d65dd1d0dce2',
-      'Morning Routine',
+      'd8c476ad-f436-4f15-81fc-6297879ac17b',
+      deskIds.desk1,
+      userIds.admin,
+      'Morning Stand-up Reminder',
       110,
-      new Date('2025-11-13T08:00'),
-      new Date('2025-11-14T09:00'),
-      new Date('2025-11-14T09:00'),
-      new Date('2025-11-14T12:00'),
-      ScheduledTaskStatus.IN_PROGRESS,
-      ''
+      now,
+      now,
+      oneHourFromNow,
+      undefined,
+      ScheduledTaskStatus.PENDING,
+      undefined
     );
+
+    // IN_PROGRESS - currently running
     const scheduledTask2 = await createScheduledTask(
       'f5209a0c-9cbe-44e6-a745-d651f8cef7d7',
-      '2',
-      'd93419b8-7f82-4a1f-943d-6ad9bde6d993',
-      'Evening Routine',
+      deskIds.desk2,
+      userIds.user,
+      'Afternoon Break Position',
       140,
-      new Date('2025-11-13T08:00'),
-      new Date('2025-11-14T09:00'),
-      new Date('2025-11-14T15:00'),
-      new Date('2025-11-14T18:00'),
+      oneHourAgo,
+      oneHourAgo,
+      now,
+      undefined,
       ScheduledTaskStatus.IN_PROGRESS,
-      ''
+      undefined
     );
-    console.log('Created scheduled tasks:', { scheduledTask1, scheduledTask2 });
+
+    // COMPLETED - finished successfully
+    const scheduledTask3 = await createScheduledTask(
+      'a1b2c3d4-e5f6-7890-1234-567890abcdef',
+      deskIds.desk3,
+      userIds.manager,
+      'Early Morning Routine',
+      80,
+      twoHoursAgo,
+      twoHoursAgo,
+      oneHourAgo,
+      now,
+      ScheduledTaskStatus.COMPLETED,
+      undefined
+    );
+
+    // CANCELLED - user cancelled the task
+    const scheduledTask4 = await createScheduledTask(
+      'b2c3d4e5-f678-9012-3456-7890abcdef12',
+      deskIds.desk4,
+      userIds.admin,
+      'Lunch Break Position',
+      120,
+      oneHourAgo,
+      oneHourAgo,
+      twoHoursFromNow,
+      now,
+      ScheduledTaskStatus.CANCELLED,
+      undefined
+    );
+
+    // FAILED - task execution failed
+    const scheduledTask5 = await createScheduledTask(
+      'c3d4e5f6-7890-1234-5678-90abcdef1234',
+      deskIds.desk5,
+      userIds.user,
+      'Evening Wind-down',
+      70,
+      twoHoursAgo,
+      twoHoursAgo,
+      oneHourAgo,
+      now,
+      ScheduledTaskStatus.FAILED,
+      'Desk communication timeout - device offline'
+    );
+
+    console.log('Created scheduled tasks with all statuses:', {
+      scheduledTask1,
+      scheduledTask2,
+      scheduledTask3,
+      scheduledTask4,
+      scheduledTask5
+    });
   }
 
   // Create demo UserToDesk relations

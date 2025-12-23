@@ -103,8 +103,8 @@ export async function createController(id: string, name: string) {
 export async function createScheduledTask(
     id: string, desk_id: string, user_id:string,
     description:string, new_height:number,
-    created_at:Date, updated_at:Date, scheduled_at:Date, 
-    completed_at:Date, status:ScheduledTaskStatus, error_message:string
+    created_at:Date, updated_at:Date, scheduled_at:Date,
+    completed_at?:Date, status:ScheduledTaskStatus = ScheduledTaskStatus.PENDING, error_message?:string
 
 ) {
   const scheduledTask = await prisma.scheduledTask.upsert({
