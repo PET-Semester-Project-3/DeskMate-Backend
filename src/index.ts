@@ -95,8 +95,9 @@ async function startServer() {
       console.log(`[Startup] Connecting to simulator at ${process.env.SIMULATOR_URL || "http://localhost:8000"}...`)
       const synced = await syncAllDesks()
       console.log(`[Startup] Successfully synced ${synced} desks from simulator`)
-    } catch {
+    } catch(error) {
       console.warn(`[Startup] Could not sync desks - simulator not available at ${process.env.SIMULATOR_URL || "http://localhost:8000"}`)
+      console.warn(error)
     }
   })
 }

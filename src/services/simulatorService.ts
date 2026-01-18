@@ -56,10 +56,17 @@ async function fetchWithTimeout(
       ...options,
       signal: controller.signal,
     })
+    clearTimeout(timeoutId)
+
     return response
-  } finally {
+  } catch (error) {
+    clearTimeout(timeoutId)
+    throw error
+  }
+  finally {
     clearTimeout(timeoutId)
   }
+  // em
 }
 
 /**

@@ -29,7 +29,7 @@ export const picoHearbeat = async (req: Request, res: Response) => {
     // Find the controller with its associated desks
     const controller = await prisma.controller.findUnique({
       where: { id },
-      include: { desks: { include: { scheduledTasks: { where: { status: 'PENDING'}}}}
+      include: { desks: { include: { scheduledTasks: { where: { status: 'IN_PROGRESS'}}}}
       },
     })
 
@@ -118,42 +118,89 @@ export const picoConnect = async (req: Request, res: Response) => {
     if (last_id && last_id !== "-1") 
     {
       const existingController = await prisma.controller.findFirst({
-        where: { name: last_id }
+        where: { name: String(last_id) },
+        include: { desks: true }
       })
-
 
       if (existingController) 
       {
+        // Controller exists - check if it has a linked desk
+        if (existingController.desks.length > 0) {
+          return res.status(200).json({ 
+            success: true, 
+            id: last_id,
+          })
+        }
+
+        // Controller has no linked desk - find an unlinked desk
+        const unlinkedDesk = await prisma.desk.findFirst({
+          where: { controller_id: null }
+        })
+
+        if (unlinkedDesk) {
+          // Link the desk to this controller
+          await prisma.desk.update({
+            where: { id: unlinkedDesk.id },
+            data: { controller_id: existingController.id }
+          })
+
+          return res.status(200).json({ 
+            success: true, 
+            id: last_id,
+            desk_id: unlinkedDesk.id
+          })
+        }
+
+        // No unlinked desks available
         return res.status(200).json({ 
           success: true, 
-          id: last_id 
+          id: last_id
         })
       }
     }
 
-
+    // Controller doesn't exist or last_id was "-1" - create new controller
     const newController = await prisma.$transaction(async (tx) => {
-    const controller = await tx.controller.create({
-      data: {name:"-1"}
+      const controller = await tx.controller.create({
+        data: { name: "-1" }
+      })
+      
+      return await tx.controller.update({
+        where: { id: controller.id },
+        data: { name: controller.id }
+      })
     })
-    
-    // Because I am not sure what name is apperently supposed to be
-    return await tx.controller.update({
-      where: { id: controller.id },
-      data: { name: controller.id }
+
+    // Find unlinked desk
+    const unlinkedDesk = await prisma.desk.findFirst({
+      where: { controller_id: null }
     })
-  })
 
+    if (unlinkedDesk) {
+      // Link the desk to the new controller
+      await prisma.desk.update({
+        where: { id: unlinkedDesk.id },
+        data: { controller_id: newController.id }
+      })
 
+      return res.status(200).json({ 
+        success: true, 
+        id: newController.id,
+        desk_id: unlinkedDesk.id
+      })
+    }
+
+    // All desks are linked, return controller without desk
     res.status(200).json({ 
       success: true, 
-      id: newController.id 
+      id: newController.id
     })
     
   } catch (error) {
     console.error("Error in pico-connect:", error)
     res.status(500).json({ success: false, message: "Failed to process pico connection" })
   }
+  // for restart
 }
 
 // #endregion
