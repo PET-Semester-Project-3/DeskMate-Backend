@@ -26,6 +26,19 @@ export const picoHearbeat = async (req: Request, res: Response) => {
       })
     }
 
+    // Find the controller
+    const controllerExists = await prisma.controller.findFirst({
+      where: { name: id },
+    })
+
+    if (!controllerExists) 
+    {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Controller not found" 
+      })
+    }
+
     // Find the controller with its associated desks
     const controller = await prisma.controller.findUnique({
       where: { id },
@@ -35,7 +48,7 @@ export const picoHearbeat = async (req: Request, res: Response) => {
 
 
     // if it exists, it means that this controller has a desk which has a schedulled event, so we check if it is locked, if so blink
-    if (controller && desk.is_locked)
+    if (controller && controller.desks.some(desk => desk.is_locked))
     {
         res.json({ 
         success: true, 
